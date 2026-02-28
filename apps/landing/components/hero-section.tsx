@@ -106,7 +106,7 @@ export function HeroSection() {
           className="flex flex-col items-center text-center lg:w-1/2 lg:items-start lg:text-start"
         >
           <h1 className="text-4xl font-bold leading-tight text-foreground text-balance lg:text-[3.5rem] lg:leading-[1.15]">
-            حوّل كل محادثة لعملية بيع — في ثواني
+            أنشئ رابط دفع إنستا باي — في ثواني
           </h1>
           <p className="mt-5 max-w-lg text-base leading-relaxed text-muted-foreground lg:text-lg">
             أنشئ لينك دفع InstaPay في ثانيتين وابعته لعميلك على واتساب.
