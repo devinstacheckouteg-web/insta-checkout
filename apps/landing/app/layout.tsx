@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { Cairo, Inter, JetBrains_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
+import { FirebaseAnalytics } from '@/components/firebase-analytics'
 import './globals.css'
 
 const cairo = Cairo({
@@ -64,6 +65,7 @@ export default function RootLayout({
       >
         {children}
         <Analytics />
+        <FirebaseAnalytics />
       </body>
     </html>
   )
