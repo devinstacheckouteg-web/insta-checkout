@@ -1,0 +1,23 @@
+lockfileVersion: '9.0'
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
+importers:
+
+  .:
+    dependencies: {}
+
+  apps/backend:
+    dependencies: {}
+
+  apps/checkout:
+    dependencies: {}
+
+  apps/landing:
+    dependencies: {}
+
+packages: {}
+
+snapshots: {}
