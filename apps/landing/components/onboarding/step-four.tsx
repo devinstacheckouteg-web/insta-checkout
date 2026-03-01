@@ -45,7 +45,7 @@ export function StepFour({
           <div className="border-t border-border" />
           <SummaryRow
             label="رقم واتساب"
-            value={`+20${formData.whatsappNumber}`}
+            value={`+20${formData.whatsappNumber.replace(/^0/, "")}`}
             dir="ltr"
           />
         </div>

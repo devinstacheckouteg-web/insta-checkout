@@ -39,7 +39,7 @@ export function OnboardingForm() {
       category: formData.category,
       instapayNumber: formData.instapayNumber,
       maskedFullName: formData.maskedFullName,
-      whatsappNumber: `20${formData.whatsappNumber}`,
+      whatsappNumber: `20${formData.whatsappNumber?.replace(/^0/, "")}`,
       socialLinks: {
         instagram: formData.instagramLink || "",
         facebook: formData.facebookLink || "",
