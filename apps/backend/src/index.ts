@@ -20,6 +20,11 @@ if (process.env.CORS_ORIGINS) {
   allowedOrigins.push(...process.env.CORS_ORIGINS.split(",").map((o) => o.trim()))
 }
 
+app.use((req, _res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`)
+  next()
+})
+
 app.use(
   cors({
     origin: (origin, cb) => {

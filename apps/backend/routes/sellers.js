@@ -16,6 +16,8 @@ router.post("/", validateSeller, async (req, res) => {
       instapayNumber,
       maskedFullName,
       whatsappNumber,
+      firebaseUid,
+      email,
       socialLinks,
     } = req.body;
 
@@ -25,6 +27,8 @@ router.post("/", validateSeller, async (req, res) => {
       instapayNumber,
       maskedFullName,
       whatsappNumber,
+      firebaseUid,
+      email,
       whatsappVerified: false,
       socialLinks: {
         instagram: socialLinks?.instagram || "",
@@ -53,6 +57,14 @@ router.post("/", validateSeller, async (req, res) => {
     });
   } catch (err) {
     if (err.name === "MongoServerError" && err.code === 11000) {
+      const key = err.keyPattern ? Object.keys(err.keyPattern)[0] : "";
+      if (key === "email" || key === "firebaseUid") {
+        return res.status(409).json({
+          success: false,
+          error: "DUPLICATE_EMAIL",
+          message: "A seller with this email already exists.",
+        });
+      }
       return res.status(409).json({
         success: false,
         error: "DUPLICATE_WHATSAPP",

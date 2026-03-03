@@ -113,7 +113,7 @@ export function HeroSection() {
             بدون موقع، بدون تطبيق، بدون تعقيد.
           </p>
           <a
-            href="#cta"
+            href="/onboard"
             className="mt-8 inline-flex w-full items-center justify-center rounded-lg bg-primary px-8 py-4 text-base font-bold text-primary-foreground transition-colors hover:bg-primary-hover sm:w-auto"
           >
             ابدأ مجاناً

@@ -72,6 +72,8 @@ router.get("/health", (_req: Request, res: Response) => {
 })
 
 router.post("/", async (req: Request, res: Response) => {
+  const start = Date.now()
+  console.log("[POST /sellers] Request received")
   const body = req.body as Record<string, unknown>
 
   const errors = validateBody(body)
@@ -93,11 +95,7 @@ router.post("/", async (req: Request, res: Response) => {
     const db = await connectToMongo()
     const sellers = db.collection("sellers")
 
-    // Ensure unique indexes exist
-    await sellers.createIndex({ firebaseUid: 1 }, { unique: true, sparse: false })
-    await sellers.createIndex({ email: 1 }, { unique: true, sparse: false })
-    await sellers.createIndex({ whatsappNumber: 1 }, { unique: true, sparse: false })
-
+    // Indexes created separately (createIndex blocks for minutes on Atlas)
     const now = new Date()
     const doc = {
       businessName,
@@ -120,6 +118,7 @@ router.post("/", async (req: Request, res: Response) => {
     }
 
     const result = await sellers.insertOne(doc)
+    console.log(`[POST /sellers] Success in ${Date.now() - start}ms, id=${result.insertedId}`)
 
     res.status(201).json({
       success: true,

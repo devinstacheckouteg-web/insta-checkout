@@ -19,7 +19,7 @@ export function FinalCtaSection() {
           سجّل في دقيقتين وابعت أول لينك دفع لعميلك النهاردة.
         </p>
         <a
-          href="#"
+          href="/onboard"
           className="mt-8 inline-flex items-center justify-center rounded-lg bg-card px-8 py-4 text-base font-bold text-primary transition-transform hover:scale-[1.02]"
         >
           ابدأ دلوقتي — مجاناً

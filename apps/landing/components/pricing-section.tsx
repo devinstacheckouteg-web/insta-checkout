@@ -59,7 +59,7 @@ export function PricingSection() {
             </ul>
 
             <a
-              href="#cta"
+              href="/onboard"
               className="mt-8 inline-flex items-center justify-center rounded-lg border-2 border-primary px-6 py-3 text-sm font-bold text-primary transition-colors hover:bg-primary hover:text-primary-foreground"
             >
               ابدأ مجاناً
@@ -93,7 +93,7 @@ export function PricingSection() {
             </ul>
 
             <a
-              href="#cta"
+              href="/onboard"
               className="mt-8 inline-flex items-center justify-center rounded-lg bg-primary px-6 py-3 text-sm font-bold text-primary-foreground transition-colors hover:bg-primary-hover"
             >
               جرّب ١٤ يوم مجاناً

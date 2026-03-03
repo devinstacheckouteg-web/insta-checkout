@@ -55,7 +55,7 @@ export function Navbar() {
         {/* Desktop CTA */}
         <div className="hidden items-center gap-3 md:flex">
           <a
-            href="#cta"
+            href="/onboard"
             className="rounded-lg border border-primary px-5 py-2.5 text-sm font-semibold text-primary transition-colors hover:bg-primary hover:text-primary-foreground"
           >
             ابدأ دلوقتي — مجاناً
@@ -93,7 +93,7 @@ export function Navbar() {
                 </a>
               ))}
               <a
-                href="#cta"
+                href="/onboard"
                 onClick={() => setMobileOpen(false)}
                 className="mt-2 rounded-lg bg-primary px-4 py-3 text-center text-base font-semibold text-primary-foreground"
               >

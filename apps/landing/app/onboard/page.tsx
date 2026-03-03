@@ -10,10 +10,15 @@ export const metadata: Metadata = {
 
 export default function OnboardPage() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-background px-4 py-8">
-      <div className="w-full max-w-[480px]">
+    <main className="relative flex min-h-screen flex-col items-center justify-center bg-background px-4 py-8 overflow-hidden">
+      {/* Subtle gradient background */}
+      <div className="absolute inset-0 bg-gradient-to-b from-primary/[0.02] via-transparent to-transparent pointer-events-none" />
+      <div className="absolute top-0 right-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 pointer-events-none" />
+
+      <div className="relative w-full max-w-2xl">
         <div className="mb-8 text-center">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary">
+          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary shadow-lg shadow-primary/25">
             <svg
               width="24"
               height="24"
@@ -42,11 +47,11 @@ export default function OnboardPage() {
             سجّل بيزنسك على InstaPay Checkout
           </h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            في ٤ خطوات بسيطة هتبدأ تقبض أونلاين
+            في ٣ خطوات بسيطة هتبدأ تقبض أونلاين
           </p>
         </div>
 
-        <div className="rounded-2xl border border-border bg-card p-6 shadow-[0_1px_3px_rgba(0,0,0,0.08)] sm:p-8">
+        <div className="rounded-2xl border border-border bg-card p-6 shadow-xl shadow-black/5 sm:p-8">
           <OnboardingForm />
         </div>
       </div>

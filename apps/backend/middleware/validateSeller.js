@@ -43,6 +43,18 @@ function validateSeller(req, res, next) {
     errors.push({ field: "whatsappNumber", message: "Must be a valid Egyptian phone number (20XXXXXXXXXX)" });
   }
 
+  const firebaseUid = typeof body.firebaseUid === "string" ? body.firebaseUid.trim() : "";
+  if (!firebaseUid) {
+    errors.push({ field: "firebaseUid", message: "Firebase UID is required" });
+  }
+
+  const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
+  if (!email) {
+    errors.push({ field: "email", message: "Email is required" });
+  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    errors.push({ field: "email", message: "Email must be a valid format" });
+  }
+
   if (body.socialLinks) {
     const { instagram, facebook } = body.socialLinks;
     if (instagram && typeof instagram === "string" && instagram.trim()) {
@@ -74,6 +86,8 @@ function validateSeller(req, res, next) {
   req.body.instapayNumber = instapayNumber;
   req.body.maskedFullName = maskedFullName;
   req.body.whatsappNumber = whatsappNumber;
+  req.body.firebaseUid = firebaseUid;
+  req.body.email = email;
 
   next();
 }

@@ -1,85 +1,362 @@
 "use client";
 
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { motion } from "framer-motion";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { MessageCircle } from "lucide-react";
-import { step3Schema, type Step3Data } from "./types";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Loader2, ArrowLeftToLine, Mail, Lock, KeyRound } from "lucide-react";
+import { toast } from "sonner";
+import {
+  signInWithGoogle,
+  signUpWithEmail,
+  signInWithEmail,
+  resetPassword,
+} from "@/lib/firebase";
+
+const emailAuthSchema = z.object({
+  email: z.string().email("البريد الإلكتروني غير صالح"),
+  password: z.string().min(8, "كلمة السر لازم تكون ٨ أحرف على الأقل"),
+});
+
+type AuthData = z.infer<typeof emailAuthSchema>;
 
 interface StepThreeProps {
-  defaultValues: Partial<Step3Data>;
-  onNext: (data: Step3Data) => void;
   onBack: () => void;
+  onSubmit: (firebaseUid: string, email: string) => void | Promise<void>;
 }
 
-export function StepThree({ defaultValues, onNext, onBack }: StepThreeProps) {
+export function StepThree({ onBack, onSubmit }: StepThreeProps) {
+  const [authMode, setAuthMode] = useState<"choice" | "signup" | "signin">("choice");
+  const [isLoading, setIsLoading] = useState(false);
+  const [forgetPasswordOpen, setForgetPasswordOpen] = useState(false);
+  const [forgetEmail, setForgetEmail] = useState("");
+  const [forgetSending, setForgetSending] = useState(false);
+  const [forgetSent, setForgetSent] = useState(false);
+
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors },
-  } = useForm<Step3Data>({
-    resolver: zodResolver(step3Schema),
-    defaultValues: {
-      whatsappNumber: "",
-      ...defaultValues,
-    },
+  } = useForm<AuthData>({
+    resolver: zodResolver(emailAuthSchema),
+    defaultValues: { email: "", password: "" },
   });
 
+  const email = watch("email");
+
+  const handleGoogleSignIn = async () => {
+    setIsLoading(true);
+    try {
+      const user = await signInWithGoogle();
+      if (!user.email?.trim()) {
+        toast.error("حساب جوجل ده ما فيهوش إيميل — جرّب إنشاء حساب بالإيميل بدلاً.");
+        return;
+      }
+      toast.success("تم إنشاء حسابك! جاري حفظ بيانات متجرك...");
+      await onSubmit(user.uid, user.email);
+    } catch (err: unknown) {
+      const code = (err as { code?: string })?.code;
+      console.error("[Firebase Google sign-in]", code, err);
+      const message =
+        code === "auth/popup-closed-by-user"
+          ? "تم إلغاء تسجيل الدخول"
+          : code === "auth/operation-not-allowed"
+            ? "تسجيل الدخول بجوجل مش مفعّل — فعّله من Firebase Console"
+            : code === "auth/unauthorized-domain"
+              ? "الدومين ده مش مسموح — أضفه في Firebase → Authorized domains"
+              : "حصل مشكلة. جرّب تاني.";
+      toast.error(message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+
+  const handleEmailSignUp = async (data: AuthData) => {
+    setIsLoading(true);
+    try {
+      const user = await signUpWithEmail(data.email, data.password);
+      toast.success("تم إنشاء حسابك! جاري حفظ بيانات متجرك...");
+      await onSubmit(user.uid, user.email || data.email);
+    } catch (err: unknown) {
+      const code = (err as { code?: string })?.code;
+      console.error("[Firebase email sign-up]", code, err);
+      if (code === "auth/email-already-in-use") {
+        toast.error("الإيميل ده مسجل. جرّب تسجيل الدخول بدل التسجيل.");
+      } else if (code === "auth/operation-not-allowed") {
+        toast.error("التسجيل بالإيميل مش مفعّل — فعّله من Firebase Console");
+      } else {
+        toast.error("حصل مشكلة. جرّب تاني.");
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleEmailSignIn = async (data: AuthData) => {
+    setIsLoading(true);
+    try {
+      const user = await signInWithEmail(data.email, data.password);
+      toast.success("تم تسجيل الدخول!");
+      await onSubmit(user.uid, user.email || data.email);
+    } catch (err: unknown) {
+      const code = (err as { code?: string })?.code;
+      console.error("[Firebase email sign-in]", code, err);
+      if (code === "auth/invalid-credential" || code === "auth/wrong-password") {
+        toast.error("الإيميل أو كلمة السر غلط. جرّب تاني.");
+      } else if (code === "auth/user-not-found") {
+        toast.error("مفيش حساب بالإيميل ده. سجّل حساب جديد أولاً.");
+      } else {
+        toast.error("حصل مشكلة. جرّب تاني.");
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleForgetPassword = async () => {
+    const e = forgetEmail.trim() || email?.trim();
+    if (!e) {
+      toast.error("ادخل الإيميل أولاً");
+      return;
+    }
+    setForgetSending(true);
+    try {
+      await resetPassword(e);
+      setForgetSent(true);
+      toast.success("أرسلنا لك إيميل لإعادة تعيين كلمة السر");
+    } catch (err: unknown) {
+      const code = (err as { code?: string })?.code;
+      if (code === "auth/user-not-found") {
+        toast.error("مفيش حساب بالإيميل ده.");
+      } else {
+        toast.error("حصل مشكلة. جرّب تاني.");
+      }
+    } finally {
+      setForgetSending(false);
+    }
+  };
+
+  const isEmailForm = authMode === "signup" || authMode === "signin";
+
   return (
-    <form onSubmit={handleSubmit(onNext)} className="space-y-5">
-      <div className="space-y-2">
-        <Label htmlFor="whatsappNumber">رقم واتساب *</Label>
-        <div className="flex items-center gap-2" dir="ltr">
-          <span className="flex h-12 items-center rounded-lg border-[1.5px] border-[#CBD5E1] bg-muted px-3 text-sm font-medium text-muted-foreground">
-            +20
-          </span>
-          <Input
-            id="whatsappNumber"
-            placeholder="01XXXXXXXXX"
-            className="h-12 flex-1 rounded-lg border-[1.5px] border-[#CBD5E1]"
-            dir="ltr"
-            aria-describedby={errors.whatsappNumber ? "whatsappNumber-error" : undefined}
-            {...register("whatsappNumber")}
-          />
-        </div>
-        {errors.whatsappNumber && (
-          <p id="whatsappNumber-error" className="text-sm text-destructive">
-            {errors.whatsappNumber.message}
+    <>
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="space-y-6"
+      >
+        <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
+          <h3 className="text-lg font-bold text-foreground mb-1">إنشاء حسابك</h3>
+          <p className="text-sm text-muted-foreground">
+            سجّل حسابك عشان تقدر تدخل وتدير متجرك لاحقاً
           </p>
-        )}
-      </div>
-
-      <div className="rounded-xl border border-blue-200 bg-blue-50 p-4">
-        <div className="flex items-start gap-3">
-          <MessageCircle className="mt-0.5 h-5 w-5 shrink-0 text-blue-600" />
-          <div>
-            <p className="font-bold text-foreground">بعد التسجيل:</p>
-            <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-              هنبعتلك رسالة تحقق على واتساب. البوت بتاعنا هيبقى جاهز يساعدك
-              تعمل لينكات دفع فورية.
-            </p>
-          </div>
         </div>
-      </div>
 
-      <div className="flex gap-3">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={onBack}
-          className="h-12 flex-1 rounded-xl text-base"
-        >
-          رجوع
-        </Button>
-        <Button
-          type="submit"
-          className="h-12 flex-1 rounded-xl bg-primary text-base font-bold text-primary-foreground hover:bg-primary-hover"
-        >
-          التالي
-        </Button>
-      </div>
-    </form>
+        {authMode === "choice" && (
+          <div className="space-y-4">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleGoogleSignIn}
+              disabled={isLoading}
+              className="h-12 w-full rounded-xl border-2 border-border bg-white text-base font-semibold hover:bg-muted/80 hover:border-primary/30 transition-all gap-2"
+            >
+              {isLoading ? (
+                <Loader2 className="h-5 w-5 animate-spin" />
+              ) : (
+                <>
+                  <svg className="h-5 w-5" viewBox="0 0 24 24">
+                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+                  </svg>
+                  سجّل بحساب جوجل
+                </>
+              )}
+            </Button>
+
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t border-border" />
+              </div>
+              <div className="relative flex justify-center text-xs">
+                <span className="bg-background px-3 text-muted-foreground">أو</span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setAuthMode("signup")}
+                className="h-12 rounded-xl text-base gap-2"
+              >
+                <Mail className="h-4 w-4" />
+                إنشاء حساب
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setAuthMode("signin")}
+                className="h-12 rounded-xl text-base gap-2"
+              >
+                <KeyRound className="h-4 w-4" />
+                تسجيل دخول
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {isEmailForm && (
+          <motion.form
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            onSubmit={handleSubmit(authMode === "signup" ? handleEmailSignUp : handleEmailSignIn)}
+            className="rounded-xl border border-border bg-card p-6 space-y-4"
+          >
+            <div className="space-y-2">
+              <Label htmlFor="email">البريد الإلكتروني</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="you@example.com"
+                className="h-12 rounded-lg"
+                dir="ltr"
+                {...register("email")}
+              />
+              {errors.email && (
+                <p className="text-sm text-destructive">{errors.email.message}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="password">كلمة السر</Label>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setForgetEmail(email || "");
+                    setForgetSent(false);
+                    setForgetPasswordOpen(true);
+                  }}
+                  className="text-xs text-primary hover:underline"
+                >
+                  نسيت كلمة السر؟
+                </button>
+              </div>
+              <Input
+                id="password"
+                type="password"
+                placeholder={authMode === "signup" ? "8 أحرف على الأقل" : "كلمة السر"}
+                className="h-12 rounded-lg"
+                dir="ltr"
+                {...register("password")}
+              />
+              {errors.password && (
+                <p className="text-sm text-destructive">{errors.password.message}</p>
+              )}
+            </div>
+
+            <div className="flex gap-3 pt-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onBack}
+                disabled={isLoading}
+                className="h-12 flex-1 rounded-xl gap-2"
+              >
+                <ArrowLeftToLine className="h-4 w-4" />
+                رجوع
+              </Button>
+              <Button
+                type="submit"
+                disabled={isLoading}
+                className="h-12 flex-1 rounded-xl bg-primary font-bold gap-2"
+              >
+                {isLoading ? (
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                ) : authMode === "signup" ? (
+                  "إنشاء الحساب"
+                ) : (
+                  "تسجيل الدخول"
+                )}
+              </Button>
+            </div>
+          </motion.form>
+        )}
+
+        {authMode === "choice" && (
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={onBack}
+            className="w-full gap-2 text-muted-foreground"
+          >
+            <ArrowLeftToLine className="h-4 w-4" />
+            رجوع للخطوة السابقة
+          </Button>
+        )}
+      </motion.div>
+
+      {/* Forget Password Dialog */}
+      <Dialog open={forgetPasswordOpen} onOpenChange={setForgetPasswordOpen}>
+        <DialogContent className="sm:max-w-md" showCloseButton>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Lock className="h-5 w-5" />
+              نسيت كلمة السر؟
+            </DialogTitle>
+            <DialogDescription>
+              {forgetSent
+                ? "تم الإرسال! افتح إيميلك واضغط على اللينك عشان تعيّن كلمة سر جديدة."
+                : "ادخل إيميلك وهنبعته لك لينك لإعادة تعيين كلمة السر."}
+            </DialogDescription>
+          </DialogHeader>
+          {!forgetSent && (
+            <div className="space-y-2 py-2">
+              <Label htmlFor="forget-email">البريد الإلكتروني</Label>
+              <Input
+                id="forget-email"
+                type="email"
+                placeholder="you@example.com"
+                value={forgetEmail}
+                onChange={(e) => setForgetEmail(e.target.value)}
+                className="h-12 rounded-lg"
+                dir="ltr"
+              />
+            </div>
+          )}
+          <DialogFooter>
+            {forgetSent ? (
+              <Button onClick={() => setForgetPasswordOpen(false)}>تمام</Button>
+            ) : (
+              <>
+                <Button variant="outline" onClick={() => setForgetPasswordOpen(false)}>
+                  إلغاء
+                </Button>
+                <Button onClick={handleForgetPassword} disabled={forgetSending}>
+                  {forgetSending ? <Loader2 className="h-4 w-4 animate-spin" /> : "إرسال"}
+                </Button>
+              </>
+            )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }

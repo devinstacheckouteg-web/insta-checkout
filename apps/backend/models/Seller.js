@@ -41,6 +41,19 @@ const sellerSchema = new mongoose.Schema(
         message: "Masked full name must contain at least one * character",
       },
     },
+    firebaseUid: {
+      type: String,
+      required: [true, "Firebase UID is required"],
+      unique: true,
+      trim: true,
+    },
+    email: {
+      type: String,
+      required: [true, "Email is required"],
+      unique: true,
+      trim: true,
+      lowercase: true,
+    },
     whatsappNumber: {
       type: String,
       required: [true, "WhatsApp number is required"],
@@ -75,6 +88,7 @@ const sellerSchema = new mongoose.Schema(
 );
 
 sellerSchema.index({ instapayNumber: 1 });
+sellerSchema.index({ firebaseUid: 1 }, { unique: true });
 sellerSchema.index({ createdAt: 1 });
 
 module.exports = mongoose.model("Seller", sellerSchema);

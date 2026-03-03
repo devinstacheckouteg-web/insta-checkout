@@ -1,5 +1,14 @@
 import { initializeApp } from "firebase/app"
 import { getAnalytics, type Analytics } from "firebase/analytics"
+import {
+  getAuth,
+  GoogleAuthProvider,
+  signInWithPopup,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  sendPasswordResetEmail,
+  type User,
+} from "firebase/auth"
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY ?? "AIzaSyA9TMIAeSxsNDz04NsPu-IF81iGHyEDXh4",
@@ -16,3 +25,26 @@ export const app = initializeApp(firebaseConfig)
 /** Firebase Analytics — only available in the browser (returns null during SSR). */
 export const analytics: Analytics | null =
   typeof window !== "undefined" ? getAnalytics(app) : null
+
+/** Firebase Auth — for seller registration (Google + email/password). */
+export const auth = getAuth(app)
+export const googleAuthProvider = new GoogleAuthProvider()
+
+export async function signInWithGoogle(): Promise<User> {
+  const result = await signInWithPopup(auth, googleAuthProvider)
+  return result.user
+}
+
+export async function signUpWithEmail(email: string, password: string): Promise<User> {
+  const result = await createUserWithEmailAndPassword(auth, email, password)
+  return result.user
+}
+
+export async function signInWithEmail(email: string, password: string): Promise<User> {
+  const result = await signInWithEmailAndPassword(auth, email, password)
+  return result.user
+}
+
+export async function resetPassword(email: string): Promise<void> {
+  await sendPasswordResetEmail(auth, email)
+}
