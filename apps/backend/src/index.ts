@@ -2,6 +2,7 @@ import "dotenv/config"
 import express from "express"
 import cors from "cors"
 import { connectToMongo } from "./db.js"
+import sellersRouter from "./routes/sellers.js"
 
 const app = express()
 const PORT = process.env.PORT ?? 4000
@@ -18,6 +19,11 @@ const allowedOrigins = [
 if (process.env.CORS_ORIGINS) {
   allowedOrigins.push(...process.env.CORS_ORIGINS.split(",").map((o) => o.trim()))
 }
+
+app.use((req, _res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`)
+  next()
+})
 
 app.use(
   cors({
@@ -44,6 +50,9 @@ app.get("/", (_req, res) => {
 app.get("/health", (_req, res) => {
   res.json({ status: "ok", timestamp: new Date().toISOString() })
 })
+
+// Sellers API
+app.use("/sellers", sellersRouter)
 
 // MongoDB connection validation
 app.get("/api/health/db", async (_req, res) => {

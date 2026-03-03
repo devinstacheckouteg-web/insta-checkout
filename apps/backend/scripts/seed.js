@@ -23,6 +23,8 @@ async function seed() {
     instapayNumber: "01012345678",
     maskedFullName: "أ*** م*** أ** م***",
     whatsappNumber: "201098765432",
+    firebaseUid: "seed-seller-firebase-uid-001",
+    email: "sweetbites@example.com",
     whatsappVerified: false,
     socialLinks: {
       instagram: "https://instagram.com/sweetbites",
@@ -78,6 +80,8 @@ async function seed() {
       instapayNumber: "99999999",
       maskedFullName: "T*** T***",
       whatsappNumber: "201098765432",
+      firebaseUid: "seed-duplicate-uid",
+      email: "duplicate@example.com",
     });
     console.log("ERROR: Duplicate should have been rejected!");
   } catch (err) {

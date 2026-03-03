@@ -1,14 +1,10 @@
 "use client";
 
+import { motion } from "framer-motion";
 import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const steps = [
-  "معلومات البيزنس",
-  "تفاصيل InstaPay",
-  "رقم واتساب",
-  "تأكيد",
-];
+const steps = ["جرّب المنتج", "معلوماتك", "سجّل حسابك"];
 
 interface StepIndicatorProps {
   currentStep: number;
@@ -24,26 +20,28 @@ export function StepIndicator({ currentStep }: StepIndicatorProps) {
 
         return (
           <div key={index} className="flex items-center">
-            <div className="flex flex-col items-center gap-1.5">
-              <div
+            <div className="flex flex-col items-center gap-2">
+              <motion.div
+                initial={false}
+                animate={{ scale: isActive ? 1.05 : 1 }}
                 className={cn(
-                  "flex h-9 w-9 items-center justify-center rounded-full text-sm font-bold transition-colors",
+                  "flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold transition-colors duration-300",
                   isCompleted && "bg-success text-white",
-                  isActive && "bg-primary text-white",
-                  !isCompleted &&
-                    !isActive &&
-                    "border-2 border-[#CBD5E1] text-[#CBD5E1]"
+                  isActive && "bg-primary text-primary-foreground shadow-md shadow-primary/20",
+                  !isCompleted && !isActive && "border-2 border-border text-muted-foreground"
                 )}
               >
                 {isCompleted ? (
-                  <Check className="h-5 w-5" />
+                  <Check className="h-5 w-5 text-white" strokeWidth={2.5} />
                 ) : (
-                  stepNum
+                  <span className={isActive ? "text-primary-foreground" : isCompleted ? "text-white" : "text-muted-foreground"}>
+                    {stepNum}
+                  </span>
                 )}
-              </div>
+              </motion.div>
               <span
                 className={cn(
-                  "text-[11px] font-medium whitespace-nowrap",
+                  "text-[11px] font-medium whitespace-nowrap transition-colors",
                   isActive
                     ? "text-primary"
                     : isCompleted
@@ -57,12 +55,12 @@ export function StepIndicator({ currentStep }: StepIndicatorProps) {
             {index < steps.length - 1 && (
               <div
                 className={cn(
-                  "h-0.5 w-8 sm:w-12 mx-1 mt-[-18px]",
+                  "h-0.5 w-6 sm:w-10 mx-0.5 mt-[-20px] rounded-full transition-colors duration-300",
                   currentStep > stepNum + 1
                     ? "bg-success"
                     : currentStep > stepNum
-                      ? "bg-primary"
-                      : "bg-[#CBD5E1]"
+                      ? "bg-primary/60"
+                      : "bg-border"
                 )}
               />
             )}
