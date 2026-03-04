@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { OnboardingForm } from "@/components/onboarding/onboarding-form";
 import { Toaster } from "@/components/ui/sonner";
 
@@ -47,12 +48,14 @@ export default function OnboardPage() {
             سجّل بيزنسك على InstaPay Checkout
           </h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            في ٣ خطوات بسيطة هتبدأ تقبض أونلاين
+            في خطوتين بسيطين هتبدأ تقبض أونلاين
           </p>
         </div>
 
         <div className="rounded-2xl border border-border bg-card p-6 shadow-xl shadow-black/5 sm:p-8">
-          <OnboardingForm />
+          <Suspense fallback={<div className="h-40" />}>
+            <OnboardingForm />
+          </Suspense>
         </div>
       </div>
       <Toaster position="top-center" dir="rtl" />
