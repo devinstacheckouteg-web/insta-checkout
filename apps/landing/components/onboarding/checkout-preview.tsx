@@ -25,6 +25,7 @@ interface CheckoutPreviewProps {
   categoryTag?: string;
   inPhoneFrame?: boolean;
   disabled?: boolean;
+  size?: "full" | "thumbnail";
   className?: string;
 }
 
@@ -38,6 +39,7 @@ export function CheckoutPreview({
   categoryTag,
   inPhoneFrame = true,
   disabled = true,
+  size = "full",
   className,
 }: CheckoutPreviewProps) {
   const iconName = businessType
@@ -156,15 +158,23 @@ export function CheckoutPreview({
   );
 
   if (inPhoneFrame) {
+    const isThumbnail = size === "thumbnail";
     return (
       <div
         className={cn(
-          "relative mx-auto w-[280px] rounded-[2rem] border-[3px] border-foreground/10 bg-card p-2 shadow-xl transition-all duration-300",
+          "relative mx-auto rounded-[2rem] border-[3px] border-foreground/10 bg-card p-2 shadow-xl transition-all duration-300",
+          isThumbnail ? "w-[180px]" : "w-[280px]",
           className
         )}
       >
-        <div className="absolute top-0 left-1/2 h-6 w-24 -translate-x-1/2 rounded-b-xl bg-foreground/10" />
-        <div className="overflow-hidden rounded-[1.5rem] bg-secondary max-h-[520px] overflow-y-auto">
+        <div className={cn(
+          "absolute top-0 left-1/2 -translate-x-1/2 rounded-b-xl bg-foreground/10",
+          isThumbnail ? "h-4 w-16" : "h-6 w-24"
+        )} />
+        <div className={cn(
+          "overflow-hidden rounded-[1.5rem] bg-secondary overflow-y-auto",
+          isThumbnail ? "max-h-[340px] [&>div]:p-2 [&>div]:gap-2 [&>div]:text-[10px] [&>div]:pb-3" : "max-h-[520px]"
+        )}>
           {content}
         </div>
       </div>

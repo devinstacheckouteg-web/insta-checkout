@@ -27,9 +27,7 @@ function validateBody(body: Record<string, unknown>): ValidationError[] {
   }
 
   const category = typeof body.category === "string" ? body.category.trim() : ""
-  if (!category) {
-    errors.push({ field: "category", message: "Category is required" })
-  } else if (!VALID_CATEGORIES.includes(category)) {
+  if (category && !VALID_CATEGORIES.includes(category)) {
     errors.push({ field: "category", message: `Category must be one of: ${VALID_CATEGORIES.join(", ")}` })
   }
 
@@ -83,7 +81,7 @@ router.post("/", async (req: Request, res: Response) => {
   }
 
   const businessName = (body.businessName as string).trim()
-  const category = (body.category as string).trim()
+  const category = typeof body.category === "string" ? (body.category as string).trim() || null : null
   const instapayNumber = (body.instapayNumber as string).trim()
   const maskedFullName = (body.maskedFullName as string).trim()
   const whatsappNumber = (body.whatsappNumber as string).trim()

@@ -1,38 +1,36 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { StepIndicator } from "./step-indicator";
-import { StepOne } from "./step-one";
 import { StepTwo } from "./step-two";
 import { StepThree } from "./step-three";
 import { ConfirmationScreen } from "./confirmation-screen";
-import type { FullFormData, Step1Data, Step2Data } from "./types";
+import type { Step2Data } from "./types";
 
 export function OnboardingForm() {
+  const searchParams = useSearchParams();
+  const categoryFromUrl = searchParams.get("category");
+
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
-  const [formData, setFormData] = useState<Partial<FullFormData>>({});
+  const [formData, setFormData] = useState<Partial<Step2Data>>({});
 
-  const handleStep1 = useCallback((data: Step1Data) => {
-    setFormData((prev) => ({ ...prev, ...data, category: data.businessType }));
+  const handleBusinessInfo = useCallback((data: Step2Data) => {
+    setFormData((prev) => ({ ...prev, ...data }));
     setCurrentStep(2);
   }, []);
 
-  const handleStep2 = useCallback((data: Step2Data) => {
-    setFormData((prev) => ({ ...prev, ...data }));
-    setCurrentStep(3);
-  }, []);
-
-  const handleStep3Auth = useCallback(
+  const handleAuth = useCallback(
     async (firebaseUid: string, email: string): Promise<void> => {
       setIsSubmitting(true);
 
       const payload = {
         businessName: formData.businessName,
-        category: formData.category,
+        category: categoryFromUrl || null,
         instapayNumber: formData.instapayNumber,
         maskedFullName: formData.maskedFullName,
         whatsappNumber: `20${formData.whatsappNumber?.replace(/^0/, "")}`,
@@ -70,18 +68,18 @@ export function OnboardingForm() {
           } else {
             toast.error("الرقم ده مسجل قبل كده. جرّب رقم تاني أو تواصل معانا.");
           }
-          setCurrentStep(3);
+          setCurrentStep(2);
           return;
         }
 
         if (res.status === 400 && body.details?.length) {
           const fieldStepMap: Record<string, number> = {
-            businessName: 2,
-            instapayNumber: 2,
-            maskedFullName: 2,
-            whatsappNumber: 2,
-            email: 3,
-            firebaseUid: 3,
+            businessName: 1,
+            instapayNumber: 1,
+            maskedFullName: 1,
+            whatsappNumber: 1,
+            email: 2,
+            firebaseUid: 2,
           };
           const firstField = body.details[0]?.field;
           if (firstField && fieldStepMap[firstField]) {
@@ -110,16 +108,14 @@ export function OnboardingForm() {
         setIsSubmitting(false);
       }
     },
-    [formData]
+    [formData, categoryFromUrl]
   );
 
   if (isComplete) {
     return (
       <ConfirmationScreen
         businessName={formData.businessName || ""}
-        productName={formData.productName || ""}
-        price={formData.price ?? 0}
-        businessType={formData.category}
+        category={categoryFromUrl}
       />
     );
   }
@@ -137,7 +133,10 @@ export function OnboardingForm() {
             exit={{ opacity: 0, x: 12 }}
             transition={{ duration: 0.25 }}
           >
-            <StepOne defaultValues={formData} onNext={handleStep1} />
+            <StepTwo
+              defaultValues={formData}
+              onNext={handleBusinessInfo}
+            />
           </motion.div>
         )}
         {currentStep === 2 && (
@@ -148,24 +147,9 @@ export function OnboardingForm() {
             exit={{ opacity: 0, x: 12 }}
             transition={{ duration: 0.25 }}
           >
-            <StepTwo
-              defaultValues={formData}
-              onNext={handleStep2}
-              onBack={() => setCurrentStep(1)}
-            />
-          </motion.div>
-        )}
-        {currentStep === 3 && (
-          <motion.div
-            key="step3"
-            initial={{ opacity: 0, x: -12 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 12 }}
-            transition={{ duration: 0.25 }}
-          >
             <StepThree
-              onBack={() => setCurrentStep(2)}
-              onSubmit={handleStep3Auth}
+              onBack={() => setCurrentStep(1)}
+              onSubmit={handleAuth}
             />
           </motion.div>
         )}
