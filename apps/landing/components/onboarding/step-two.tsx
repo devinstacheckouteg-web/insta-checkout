@@ -8,7 +8,6 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Lock } from "lucide-react";
 import { step2Schema, type Step2Data } from "./types";
-import { CheckoutPreview } from "./checkout-preview";
 
 interface StepTwoProps {
   defaultValues: Partial<Step2Data>;
@@ -20,7 +19,6 @@ export function StepTwo({ defaultValues, onNext, onBack }: StepTwoProps) {
   const {
     register,
     handleSubmit,
-    watch,
     formState: { errors },
   } = useForm<Step2Data>({
     resolver: zodResolver(step2Schema),
@@ -33,10 +31,6 @@ export function StepTwo({ defaultValues, onNext, onBack }: StepTwoProps) {
     },
   });
 
-  const watchedBusinessName = watch("businessName");
-  const watchedInstapay = watch("instapayNumber");
-  const watchedMaskedName = watch("maskedFullName");
-
   return (
     <form onSubmit={handleSubmit(onNext)} className="space-y-5">
       <motion.div
@@ -44,24 +38,7 @@ export function StepTwo({ defaultValues, onNext, onBack }: StepTwoProps) {
         animate={{ opacity: 1, y: 0 }}
         className="space-y-5"
       >
-
-      {/* Thumbnail preview banner (mobile) */}
-      <div className="md:hidden flex justify-center pb-2">
-        <CheckoutPreview
-          businessName={watchedBusinessName || "اسم البيزنس بتاعك"}
-          productName="اسم المنتج"
-          price={100}
-          instapayNumber={watchedInstapay || "01XXXXXXXXX"}
-          maskedName={watchedMaskedName || "أ*** م*** أ** م***"}
-          inPhoneFrame
-          disabled
-          size="thumbnail"
-        />
-      </div>
-
-      <div className="flex gap-6">
-        {/* Form fields */}
-        <div className="flex-1 space-y-5">
+        <div className="space-y-5">
           <div className="space-y-2">
             <Label htmlFor="businessName">اسم البيزنس *</Label>
             <Input
@@ -151,39 +128,24 @@ export function StepTwo({ defaultValues, onNext, onBack }: StepTwoProps) {
           </div>
         </div>
 
-        {/* Thumbnail preview sidebar (desktop) */}
-        <div className="hidden md:flex items-start pt-6">
-          <CheckoutPreview
-            businessName={watchedBusinessName || "اسم البيزنس بتاعك"}
-            productName="اسم المنتج — ١٠٠ جنيه"
-            price={100}
-            instapayNumber={watchedInstapay || "01XXXXXXXXX"}
-            maskedName={watchedMaskedName || "أ*** م*** أ** م***"}
-            inPhoneFrame
-            disabled
-            size="thumbnail"
-          />
-        </div>
-      </div>
-
-      <div className="flex gap-3 pt-2">
-        {onBack && (
+        <div className="flex gap-3 pt-2">
+          {onBack && (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onBack}
+              className="h-12 flex-1 rounded-xl text-base gap-2 hover:bg-muted/80"
+            >
+              رجوع
+            </Button>
+          )}
           <Button
-            type="button"
-            variant="outline"
-            onClick={onBack}
-            className="h-12 flex-1 rounded-xl text-base gap-2 hover:bg-muted/80"
+            type="submit"
+            className="h-12 flex-1 rounded-xl bg-primary text-base font-bold text-primary-foreground hover:bg-primary-hover shadow-lg shadow-primary/20"
           >
-            رجوع
+            الخطوة الأخيرة — إنشاء الحساب
           </Button>
-        )}
-        <Button
-          type="submit"
-          className="h-12 flex-1 rounded-xl bg-primary text-base font-bold text-primary-foreground hover:bg-primary-hover shadow-lg shadow-primary/20"
-        >
-          الخطوة الأخيرة — إنشاء الحساب
-        </Button>
-      </div>
+        </div>
       </motion.div>
     </form>
   );
