@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const steps = ["جرّب المنتج", "معلوماتك", "سجّل حسابك"];
+const steps = ["معلوماتك", "سجّل حسابك"];
 
 interface StepIndicatorProps {
   currentStep: number;

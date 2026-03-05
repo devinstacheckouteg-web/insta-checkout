@@ -5,20 +5,24 @@ import Link from "next/link";
 import { CheckCircle, MessageCircle, LayoutDashboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CheckoutPreview } from "./checkout-preview";
+import { BUSINESS_TYPE_OPTIONS } from "./types";
 
 interface ConfirmationScreenProps {
   businessName: string;
-  productName: string;
-  price: number;
-  businessType?: "Food & Desserts" | "Clothing" | "Electronics" | "Services" | "Other";
+  category?: string | null;
 }
 
 export function ConfirmationScreen({
   businessName,
-  productName,
-  price,
-  businessType = "Food & Desserts",
+  category,
 }: ConfirmationScreenProps) {
+  const match = category
+    ? BUSINESS_TYPE_OPTIONS.find((o) => o.value === category)
+    : null;
+  const productName = match?.defaultProduct ?? "منتج تجريبي";
+  const price = match?.defaultPrice ?? 200;
+  const businessType = (match?.value ?? "Other") as "Food & Desserts" | "Clothing" | "Electronics" | "Services" | "Other";
+
   const botNumber = process.env.NEXT_PUBLIC_WHATSAPP_BOT_NUMBER || "201000000000";
   const whatsappText = encodeURIComponent(`${productName} ${price}`);
   const whatsappLink = `https://wa.me/${botNumber}?text=${whatsappText}`;
