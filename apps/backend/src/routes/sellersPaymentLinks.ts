@@ -2,8 +2,11 @@ import { Router, Request, Response } from "express"
 import { connectToMongo } from "../db.js"
 import { requireFirebaseAuth } from "../middleware/firebaseAuth.js"
 import { ObjectId } from "mongodb"
+import crypto from "crypto"
 
 const router = Router()
+const DEFAULT_TTL_DAYS = 7
+const CHECKOUT_BASE_URL = process.env.CHECKOUT_BASE_URL ?? "https://checkout.instacheckouteg.com"
 
 router.use(requireFirebaseAuth)
 
@@ -11,6 +14,10 @@ async function getSellerId(firebaseUid: string): Promise<ObjectId | null> {
   const db = await connectToMongo()
   const seller = await db.collection("sellers").findOne({ firebaseUid })
   return seller ? (seller._id as ObjectId) : null
+}
+
+function generateToken(): string {
+  return crypto.randomBytes(12).toString("base64url")
 }
 
 router.get("/payment-links", async (req: Request, res: Response) => {
@@ -79,6 +86,138 @@ router.get("/payment-links", async (req: Request, res: Response) => {
   } catch (err) {
     console.error("[GET /sellers/me/payment-links]", err)
     res.status(500).json({ error: "INTERNAL_ERROR", message: "Failed to fetch payment links" })
+  }
+})
+
+router.post("/products/:id/payment-links", async (req: Request, res: Response) => {
+  const firebaseUid = req.firebaseUid
+  if (!firebaseUid) {
+    res.status(401).json({ error: "UNAUTHORIZED" })
+    return
+  }
+
+  const sellerId = await getSellerId(firebaseUid)
+  if (!sellerId) {
+    res.status(404).json({ error: "NOT_FOUND", message: "Seller not found" })
+    return
+  }
+
+  let productId: ObjectId
+  try {
+    productId = new ObjectId(req.params.id)
+  } catch {
+    res.status(400).json({ error: "INVALID_ID", message: "Invalid product ID" })
+    return
+  }
+
+  try {
+    const db = await connectToMongo()
+    const products = db.collection("products")
+    const paymentLinks = db.collection("payment_links")
+
+    const product = await products.findOne({ _id: productId, sellerId })
+    if (!product) {
+      res.status(404).json({ error: "NOT_FOUND", message: "Product not found" })
+      return
+    }
+    if (product.status === "archived") {
+      res.status(400).json({ error: "PRODUCT_ARCHIVED", message: "Cannot create link for archived product" })
+      return
+    }
+
+    const token = generateToken()
+    const now = new Date()
+    const expiresAt = new Date(now.getTime() + DEFAULT_TTL_DAYS * 24 * 60 * 60 * 1000)
+    const checkoutUrl = `${CHECKOUT_BASE_URL.replace(/\/$/, "")}/l/${token}`
+
+    const doc = {
+      token,
+      sellerId,
+      productId,
+      productName: product.name,
+      price: product.price,
+      checkoutUrl,
+      status: "active",
+      createdAt: now,
+      expiresAt,
+      paidAt: null,
+      cancelledAt: null,
+    }
+
+    const result = await paymentLinks.insertOne(doc)
+
+    res.status(201).json({
+      paymentLinkId: result.insertedId,
+      checkoutUrl,
+      status: "active",
+      createdAt: now,
+      expiresAt,
+    })
+  } catch (err) {
+    console.error("[POST /sellers/me/products/:id/payment-links]", err)
+    res.status(500).json({ error: "INTERNAL_ERROR", message: "Failed to create payment link" })
+  }
+})
+
+router.delete("/payment-links/:id", async (req: Request, res: Response) => {
+  const firebaseUid = req.firebaseUid
+  if (!firebaseUid) {
+    res.status(401).json({ error: "UNAUTHORIZED" })
+    return
+  }
+
+  const sellerId = await getSellerId(firebaseUid)
+  if (!sellerId) {
+    res.status(404).json({ error: "NOT_FOUND", message: "Seller not found" })
+    return
+  }
+
+  let linkId: ObjectId
+  try {
+    linkId = new ObjectId(req.params.id)
+  } catch {
+    res.status(400).json({ error: "INVALID_ID", message: "Invalid payment link ID" })
+    return
+  }
+
+  try {
+    const db = await connectToMongo()
+    const paymentLinks = db.collection("payment_links")
+
+    const link = await paymentLinks.findOne({ _id: linkId, sellerId })
+    if (!link) {
+      res.status(404).json({ error: "NOT_FOUND", message: "Payment link not found" })
+      return
+    }
+    if (link.status !== "active") {
+      res.status(409).json({
+        error: "NOT_CANCELLABLE",
+        message: "Only active links can be cancelled",
+      })
+      return
+    }
+    if (new Date() > link.expiresAt) {
+      await paymentLinks.updateOne(
+        { _id: linkId },
+        { $set: { status: "expired", updatedAt: new Date() } }
+      )
+      res.status(409).json({
+        error: "EXPIRED",
+        message: "Link has already expired",
+      })
+      return
+    }
+
+    const now = new Date()
+    await paymentLinks.updateOne(
+      { _id: linkId, sellerId },
+      { $set: { status: "cancelled", cancelledAt: now, updatedAt: now } }
+    )
+
+    res.json({ success: true, message: "Payment link cancelled" })
+  } catch (err) {
+    console.error("[DELETE /sellers/me/payment-links/:id]", err)
+    res.status(500).json({ error: "INTERNAL_ERROR", message: "Failed to cancel payment link" })
   }
 })
 

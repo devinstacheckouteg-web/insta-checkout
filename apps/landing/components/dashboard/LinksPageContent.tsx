@@ -7,7 +7,7 @@ import { getBackendUrl, fetchWithAuth } from "@/lib/api";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Link2, Copy, MessageCircle, Package } from "lucide-react";
+import { Link2, Copy, MessageCircle, Package, XCircle } from "lucide-react";
 import { toast } from "sonner";
 
 type PaymentLink = {
@@ -74,6 +74,21 @@ export function LinksPageContent() {
       `https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_BOT_NUMBER || "201000000000"}?text=${text}`,
       "_blank"
     )
+  };
+
+  const cancelLink = async (id: string) => {
+    try {
+      const res = await fetchWithAuth(
+        `${getBackendUrl()}/sellers/me/payment-links/${id}`,
+        { method: "DELETE" },
+        getToken
+      );
+      if (!res.ok) throw new Error(`Failed: ${res.status}`);
+      toast.success("تم إلغاء اللينك");
+      loadLinks();
+    } catch {
+      toast.error("فشل إلغاء اللينك");
+    }
   };
 
   if (error) {
@@ -206,6 +221,16 @@ export function LinksPageContent() {
                               <MessageCircle className="h-4 w-4" />
                             </Button>
                           </>
+                        )}
+                        {link.status === "active" && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                            onClick={() => cancelLink(link.id)}
+                          >
+                            <XCircle className="h-4 w-4" />
+                          </Button>
                         )}
                       </div>
                     </td>

@@ -15,7 +15,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { Package, Plus, Pencil, Trash2, Link2 } from "lucide-react";
+import { Package, Plus, Pencil, Trash2, Link2, Copy, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
 
 type Product = {
@@ -48,6 +48,13 @@ export function ProductsPageContent() {
   const [formPrice, setFormPrice] = useState("");
   const [formDescription, setFormDescription] = useState("");
   const [saving, setSaving] = useState(false);
+  const [linkModalOpen, setLinkModalOpen] = useState(false);
+  const [generatedLink, setGeneratedLink] = useState<{
+    checkoutUrl: string;
+    productName: string;
+    expiresAt: string;
+  } | null>(null);
+  const [generatingId, setGeneratingId] = useState<string | null>(null);
 
   const getToken = () =>
     auth.currentUser ? auth.currentUser.getIdToken() : Promise.resolve(null);
@@ -154,6 +161,51 @@ export function ProductsPageContent() {
     } finally {
       setSaving(false);
     }
+  };
+
+  const handleGenerateLink = async (p: Product) => {
+    if (p.status !== "active") return;
+    setGeneratingId(p.id);
+    try {
+      const res = await fetchWithAuth(
+        `${getBackendUrl()}/sellers/me/products/${p.id}/payment-links`,
+        { method: "POST" },
+        getToken
+      );
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.message || "فشل إنشاء اللينك");
+      }
+      const data = await res.json();
+      setGeneratedLink({
+        checkoutUrl: data.checkoutUrl,
+        productName: p.name,
+        expiresAt: data.expiresAt,
+      });
+      setLinkModalOpen(true);
+      loadProducts();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "حدث خطأ");
+    } finally {
+      setGeneratingId(null);
+    }
+  };
+
+  const copyLink = () => {
+    if (!generatedLink) return;
+    navigator.clipboard.writeText(generatedLink.checkoutUrl);
+    toast.success("تم نسخ اللينك");
+  };
+
+  const shareWhatsApp = () => {
+    if (!generatedLink) return;
+    const text = encodeURIComponent(
+      `ده لينك الدفع الخاص بمنتج ${generatedLink.productName}: ${generatedLink.checkoutUrl}`
+    );
+    window.open(
+      `https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_BOT_NUMBER || "201000000000"}?text=${text}`,
+      "_blank"
+    );
   };
 
   const handleDelete = async (id: string) => {
@@ -265,11 +317,17 @@ export function ProductsPageContent() {
                     variant="outline"
                     size="sm"
                     className="gap-1 font-cairo"
-                    disabled
-                    title="قريباً"
+                    disabled={p.status !== "active" || generatingId === p.id}
+                    onClick={() => handleGenerateLink(p)}
                   >
-                    <Link2 className="h-3 w-3" />
-                    لينك دفع
+                    {generatingId === p.id ? (
+                      "جاري..."
+                    ) : (
+                      <>
+                        <Link2 className="h-3 w-3" />
+                        لينك دفع
+                      </>
+                    )}
                   </Button>
                 </div>
               </CardContent>
@@ -332,6 +390,40 @@ export function ProductsPageContent() {
               </Button>
             </DialogFooter>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={linkModalOpen} onOpenChange={setLinkModalOpen}>
+        <DialogContent className="font-cairo sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>لينك الدفع جاهز</DialogTitle>
+          </DialogHeader>
+          {generatedLink && (
+            <div className="space-y-4">
+              <div>
+                <Label className="text-slate-500">اللينك</Label>
+                <Input
+                  readOnly
+                  value={generatedLink.checkoutUrl}
+                  className="mt-1 font-mono text-sm"
+                />
+              </div>
+              <div className="flex gap-2">
+                <Button onClick={copyLink} className="gap-2 font-cairo">
+                  <Copy className="h-4 w-4" />
+                  نسخ
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={shareWhatsApp}
+                  className="gap-2 font-cairo bg-[#25D366]/10 text-[#25D366] hover:bg-[#25D366]/20"
+                >
+                  <MessageCircle className="h-4 w-4" />
+                  مشاركة واتساب
+                </Button>
+              </div>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </div>
