@@ -1,6 +1,7 @@
 "use client"
 
 import { CheckCircle2, Clock, MessageCircle } from "lucide-react"
+import { useTranslations } from "@/lib/locale-provider"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 
@@ -17,6 +18,7 @@ export function StepThree({
   sellerName,
   whatsappLink,
 }: StepThreeProps) {
+  const { t } = useTranslations()
   return (
     <div className="flex flex-col items-center gap-6">
       {/* Success Icon */}
@@ -26,10 +28,10 @@ export function StepThree({
         </div>
         <div className="flex flex-col items-center gap-2 text-center">
           <h2 className="text-xl font-bold text-foreground">
-            تم إرسال تفاصيل الدفع!
+            {t("checkout.step3.successTitle")}
           </h2>
           <p className="text-sm text-muted-foreground leading-relaxed max-w-xs">
-            تم إرسال تفاصيل الدفع الخاصة بك إلى <span className="font-bold text-foreground">{sellerName}</span>. سيقوم البائع بمراجعة وتأكيد طلبك قريبًا.
+            {t("checkout.step3.successSubtitle", { sellerName })}
           </p>
         </div>
       </div>
@@ -37,22 +39,22 @@ export function StepThree({
       {/* Order Recap */}
       <Card className="w-full shadow-[0_1px_3px_rgba(0,0,0,0.08)]">
         <div className="bg-accent px-5 py-3 border-b border-border">
-          <p className="text-sm font-bold text-accent-foreground">ملخص الطلب</p>
+          <p className="text-sm font-bold text-accent-foreground">{t("checkout.step3.orderSummary")}</p>
         </div>
         <CardContent className="py-5">
           <div className="flex flex-col gap-4">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-muted-foreground">المنتج</span>
+              <span className="text-sm text-muted-foreground">{t("checkout.step3.product")}</span>
               <span className="text-sm font-bold text-foreground">{productName}</span>
             </div>
             <div className="h-px bg-border" />
             <div className="flex items-center justify-between">
-              <span className="text-sm text-muted-foreground">المبلغ</span>
+              <span className="text-sm text-muted-foreground">{t("checkout.step3.amount")}</span>
               <span className="text-sm font-bold text-foreground">{price} ج.م</span>
             </div>
             <div className="h-px bg-border" />
             <div className="flex items-center justify-between">
-              <span className="text-sm text-muted-foreground">البائع</span>
+              <span className="text-sm text-muted-foreground">{t("checkout.step3.seller")}</span>
               <span className="text-sm font-bold text-foreground">{sellerName}</span>
             </div>
           </div>
@@ -67,9 +69,9 @@ export function StepThree({
               <Clock className="size-5" />
             </div>
             <div className="flex flex-col gap-0.5">
-              <p className="text-sm font-bold text-[#78350F]">في انتظار تأكيد البائع</p>
+              <p className="text-sm font-bold text-[#78350F]">{t("checkout.step3.statusTitle")}</p>
               <p className="text-xs text-[#92400E]">
-                ستتلقى تأكيدًا بمجرد أن يتحقق البائع من دفعتك. عادةً ما يستغرق ذلك بضع دقائق.
+                {t("checkout.step3.statusSubtitle")}
               </p>
             </div>
           </div>
@@ -85,7 +87,7 @@ export function StepThree({
         >
           <a href={whatsappLink} target="_blank" rel="noopener noreferrer">
             <MessageCircle className="size-5" />
-            تواصل مع البائع عبر واتساب
+            {t("checkout.step3.contactSeller")}
           </a>
         </Button>
       )}

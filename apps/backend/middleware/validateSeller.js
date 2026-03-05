@@ -1,11 +1,3 @@
-const VALID_CATEGORIES = [
-  "Food & Desserts",
-  "Clothing",
-  "Services",
-  "Electronics",
-  "Other",
-];
-
 function validateSeller(req, res, next) {
   const errors = [];
   const body = req.body || {};
@@ -17,12 +9,7 @@ function validateSeller(req, res, next) {
     errors.push({ field: "businessName", message: "Business name must be 2–100 characters" });
   }
 
-  const category = typeof body.category === "string" ? body.category.trim() : "";
-  if (!category) {
-    errors.push({ field: "category", message: "Category is required" });
-  } else if (!VALID_CATEGORIES.includes(category)) {
-    errors.push({ field: "category", message: `Category must be one of: ${VALID_CATEGORIES.join(", ")}` });
-  }
+  const category = typeof body.category === "string" ? body.category.trim() || null : null;
 
   const instapayNumber = typeof body.instapayNumber === "string" ? body.instapayNumber.trim() : "";
   if (!instapayNumber) {
@@ -82,7 +69,7 @@ function validateSeller(req, res, next) {
   }
 
   req.body.businessName = businessName;
-  req.body.category = category;
+  req.body.category = category || null;
   req.body.instapayNumber = instapayNumber;
   req.body.maskedFullName = maskedFullName;
   req.body.whatsappNumber = whatsappNumber;

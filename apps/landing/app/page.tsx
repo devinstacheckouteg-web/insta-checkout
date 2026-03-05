@@ -9,6 +9,8 @@ import { PricingSection } from "@/components/pricing-section"
 import { FinalCtaSection } from "@/components/final-cta-section"
 import { Footer } from "@/components/footer"
 
+export const dynamic = "force-dynamic";
+
 export default function Home() {
   return (
     <>

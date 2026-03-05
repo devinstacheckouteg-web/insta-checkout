@@ -2,29 +2,7 @@
 
 import { motion } from "framer-motion"
 import { Smartphone, FileText, HelpCircle, TrendingDown } from "lucide-react"
-
-const painPoints = [
-  {
-    icon: Smartphone,
-    title: "بتقول للعميل 'حوّل على الرقم ده وابعتلي سكرين شوت'",
-    description: "طريقة قديمة ومفيش ضمان إن الحوالة وصلت.",
-  },
-  {
-    icon: FileText,
-    title: "بتتابع كل أوردر يدوي في النوتس",
-    description: "كل حاجة في راسك أو في ملاحظات التليفون — وسهل تنسى.",
-  },
-  {
-    icon: HelpCircle,
-    title: "مش عارف مين دفع ومين لأ",
-    description: "بتسأل كل عميل: حوّلت؟ ومفيش طريقة تتأكد بسرعة.",
-  },
-  {
-    icon: TrendingDown,
-    title: "عملاء بيتراجعوا لأن الدفع معقد",
-    description: "كل ما خطوات الدفع زادت، عملاء أكتر بيمشوا.",
-  },
-]
+import { useTranslations } from "@/lib/locale-provider"
 
 const containerVariants = {
   hidden: {},
@@ -41,6 +19,9 @@ const cardVariants = {
 }
 
 export function PainPointsSection() {
+  const { t, get } = useTranslations()
+  const items = (get("landing.painPoints.items") ?? []) as Array<{ title: string; description: string }>
+
   return (
     <section className="bg-card px-4 py-16 lg:px-8 lg:py-24">
       <div className="mx-auto max-w-7xl">
@@ -51,7 +32,7 @@ export function PainPointsSection() {
           transition={{ duration: 0.5 }}
           className="text-center text-2xl font-semibold text-foreground text-balance md:text-[2.5rem] md:leading-tight"
         >
-          لسه بتبيع بالطريقة دي؟
+          {t("landing.painPoints.title")}
         </motion.h2>
 
         <motion.div
@@ -61,20 +42,20 @@ export function PainPointsSection() {
           viewport={{ once: true }}
           className="mt-10 flex gap-4 overflow-x-auto pb-4 md:grid md:grid-cols-2 md:overflow-visible lg:grid-cols-4 lg:gap-6"
         >
-          {painPoints.map((point, i) => (
+          {[Smartphone, FileText, HelpCircle, TrendingDown].map((Icon, i) => (
             <motion.div
               key={i}
               variants={cardVariants}
               className="flex min-w-[260px] flex-col rounded-xl border border-border bg-card p-6 shadow-[0_1px_3px_rgba(0,0,0,0.08)] md:min-w-0"
             >
               <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-secondary">
-                <point.icon className="h-6 w-6 text-muted-foreground" />
+                <Icon className="h-6 w-6 text-muted-foreground" />
               </div>
               <h3 className="mt-4 text-base font-bold leading-relaxed text-foreground">
-                {point.title}
+                {items[i]?.title ?? ""}
               </h3>
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                {point.description}
+                {items[i]?.description ?? ""}
               </p>
             </motion.div>
           ))}
@@ -87,7 +68,7 @@ export function PainPointsSection() {
           transition={{ delay: 0.4 }}
           className="mt-10 text-center text-lg font-semibold text-primary"
         >
-          فيه طريقة أسهل
+          {t("landing.painPoints.cta")}
         </motion.p>
       </div>
     </section>

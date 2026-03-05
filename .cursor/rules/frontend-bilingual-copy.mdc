@@ -1,0 +1,49 @@
+---
+description: Frontend copy must be bilingual (English + Arabic) and centralized
+globs: apps/landing/**/*.{tsx,ts}, apps/checkout/**/*.{tsx,ts}
+alwaysApply: false
+---
+
+# Frontend Bilingual Copy
+
+All user-facing text in the landing and checkout apps must be bilingual (English and Arabic) and centralized for easy editing.
+
+## Copy Location
+
+- **All copy lives in** `packages/i18n/messages/`:
+  - `en.json` — English translations
+  - `ar.json` — Arabic translations
+
+Edit these files to change any user-facing text across both apps. Do **not** hardcode copy in components.
+
+## Rules
+
+1. **Never hardcode user-facing text** in TSX/TS files. Use the `t()` or `get()` functions from `useTranslations()`.
+2. **Every new string** must have an entry in both `en.json` and `ar.json` under the appropriate section (e.g. `landing`, `onboard`, `checkout`, `common`).
+3. **Match the vibe** — English translations should capture the same casual, friendly, direct tone as the Arabic (Egyptian dialect).
+4. **Use nested keys** for organization, e.g. `onboard.step2.businessName`, `checkout.step1.paymentMethod`.
+5. **For interpolated values** (e.g. `{sellerName}`), use the `t(key, { varName: value })` pattern.
+6. **For arrays** (testimonials, features, steps), use `get("section.items")` to retrieve the full array.
+
+## Usage
+
+```tsx
+import { useTranslations } from "@/lib/locale-provider";
+
+function MyComponent() {
+  const { t, get } = useTranslations();
+  return (
+    <>
+      <h1>{t("landing.hero.headline")}</h1>
+      <p>{t("checkout.step3.successSubtitle", { sellerName })}</p>
+      {get("landing.features.items")?.map((item, i) => (
+        <div key={i}>{item.title}</div>
+      ))}
+    </>
+  );
+}
+```
+
+## Language Switcher
+
+Both apps include a `LanguageSwitcher` component. Locale is persisted in a cookie and applies `dir` (rtl/ltr) and `lang` (ar/en) to the document.

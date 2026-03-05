@@ -2,31 +2,15 @@
 
 import { motion } from "framer-motion"
 import { MessageCircle, Link2, Banknote } from "lucide-react"
+import { useTranslations } from "@/lib/locale-provider"
 
-const steps = [
-  {
-    icon: MessageCircle,
-    number: "١",
-    title: "سجّل في دقيقتين",
-    description: "ادخل اسم البيزنس بتاعك وحساب InstaPay — خلاص كده.",
-  },
-  {
-    icon: Link2,
-    number: "٢",
-    title: "أنشئ لينك دفع فوري",
-    description:
-      "ابعت اسم المنتج والسعر للبوت على واتساب — هيبعتلك لينك في ثانية.",
-  },
-  {
-    icon: Banknote,
-    number: "٣",
-    title: "العميل يدفع وانت تتابع",
-    description:
-      "العميل يفتح اللينك، يحوّل InstaPay، ويأكد. انت تاخد إشعار فوري.",
-  },
-]
+const STEP_ICONS = [MessageCircle, Link2, Banknote]
 
 export function HowItWorksSection() {
+  const { t, get } = useTranslations()
+  const steps = (get("landing.howItWorks.steps") ?? []) as Array<{ title: string; description: string }>
+  const stepNumbers = (get("landing.howItWorks.stepNumbers") ?? ["1", "2", "3"]) as string[]
+
   return (
     <section id="how-it-works" className="bg-secondary px-4 py-16 lg:px-8 lg:py-24">
       <div className="mx-auto max-w-7xl">
@@ -38,10 +22,10 @@ export function HowItWorksSection() {
           className="text-center"
         >
           <h2 className="text-2xl font-semibold text-foreground text-balance md:text-[2.5rem] md:leading-tight">
-            ازاي بتشتغل
+            {t("landing.howItWorks.title")}
           </h2>
           <p className="mt-3 text-base text-muted-foreground">
-            ٣ خطوات بس — وتبدأ تقبض
+            {t("landing.howItWorks.subtitle")}
           </p>
         </motion.div>
 
@@ -51,7 +35,9 @@ export function HowItWorksSection() {
             {/* Dashed connector line */}
             <div className="absolute top-6 right-[calc(16.67%)] left-[calc(16.67%)] border-t-2 border-dashed border-primary/30" />
 
-            {steps.map((step, i) => (
+            {steps.map((step, i) => {
+              const StepIcon = STEP_ICONS[i];
+              return (
               <motion.div
                 key={i}
                 initial={{ opacity: 0, y: 30 }}
@@ -61,10 +47,10 @@ export function HowItWorksSection() {
                 className="relative flex w-1/3 flex-col items-center px-6 text-center"
               >
                 <div className="relative z-10 flex h-12 w-12 items-center justify-center rounded-full bg-primary font-mono text-lg font-bold text-primary-foreground shadow-lg">
-                  {step.number}
+                  {stepNumbers[i]}
                 </div>
                 <div className="mt-5 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-                  <step.icon className="h-6 w-6 text-primary" />
+                  <StepIcon className="h-6 w-6 text-primary" />
                 </div>
                 <h3 className="mt-4 text-lg font-bold text-foreground">
                   {step.title}
@@ -73,7 +59,8 @@ export function HowItWorksSection() {
                   {step.description}
                 </p>
               </motion.div>
-            ))}
+            );
+            })}
           </div>
         </div>
 
@@ -83,7 +70,9 @@ export function HowItWorksSection() {
             {/* Vertical dashed line */}
             <div className="absolute top-0 right-[23px] h-full w-0 border-r-2 border-dashed border-primary/30" />
 
-            {steps.map((step, i) => (
+            {steps.map((step, i) => {
+              const StepIcon = STEP_ICONS[i];
+              return (
               <motion.div
                 key={i}
                 initial={{ opacity: 0, x: 20 }}
@@ -93,11 +82,11 @@ export function HowItWorksSection() {
                 className="relative flex gap-4"
               >
                 <div className="absolute -right-8 flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary font-mono text-lg font-bold text-primary-foreground shadow-lg">
-                  {step.number}
+                  {stepNumbers[i]}
                 </div>
                 <div className="mr-8">
                   <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                    <step.icon className="h-5 w-5 text-primary" />
+                    <StepIcon className="h-5 w-5 text-primary" />
                   </div>
                   <h3 className="text-base font-bold text-foreground">
                     {step.title}
@@ -107,7 +96,8 @@ export function HowItWorksSection() {
                   </p>
                 </div>
               </motion.div>
-            ))}
+            );
+            })}
           </div>
         </div>
       </div>

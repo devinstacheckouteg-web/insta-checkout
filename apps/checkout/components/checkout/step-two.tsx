@@ -2,6 +2,7 @@
 
 import { useState, useRef, type ChangeEvent, type FormEvent } from "react"
 import { Upload, ImageIcon, X, Phone, Loader2 } from "lucide-react"
+import { useTranslations } from "@/lib/locale-provider"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -12,6 +13,7 @@ interface StepTwoProps {
 }
 
 export function StepTwo({ onSubmit, isSubmitting }: StepTwoProps) {
+  const { t } = useTranslations()
   const [phoneNumber, setPhoneNumber] = useState("")
   const [screenshot, setScreenshot] = useState<File | null>(null)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
@@ -36,15 +38,15 @@ export function StepTwo({ onSubmit, isSubmitting }: StepTwoProps) {
   const validatePhone = () => {
     const digits = phoneNumber.replace(/\D/g, "")
     if (digits.length === 0) {
-      setPhoneError("رقم الهاتف مطلوب")
+      setPhoneError(t("checkout.step2.phoneRequired"))
       return false
     }
     if (digits.length !== 11) {
-      setPhoneError("يجب أن يكون رقم الهاتف 11 رقم")
+      setPhoneError(t("checkout.step2.phoneLength"))
       return false
     }
     if (!digits.startsWith("01")) {
-      setPhoneError("يجب أن يبدأ رقم الهاتف بـ 01")
+      setPhoneError(t("checkout.step2.phonePrefix"))
       return false
     }
     return true
@@ -85,11 +87,11 @@ export function StepTwo({ onSubmit, isSubmitting }: StepTwoProps) {
           <div className="flex flex-col gap-3">
             <label htmlFor="phone" className="text-sm font-bold text-foreground flex items-center gap-2">
               <Phone className="size-4 text-primary" />
-              رقم الهاتف المستخدم في التحويل
+              {t("checkout.step2.phoneLabel")}
               <span className="text-destructive">*</span>
             </label>
             <p className="text-xs text-muted-foreground">
-              حتى يتمكن البائع من مطابقة إشعار انستاباي الخاص به
+              {t("checkout.step2.phoneHint")}
             </p>
             <div className="relative" dir="ltr">
               <Input
@@ -121,25 +123,25 @@ export function StepTwo({ onSubmit, isSubmitting }: StepTwoProps) {
           <div className="flex flex-col gap-3">
             <label className="text-sm font-bold text-foreground flex items-center gap-2">
               <ImageIcon className="size-4 text-primary" />
-              لقطة شاشة التحويل
+              {t("checkout.step2.screenshotLabel")}
               <span className="text-destructive">*</span>
             </label>
             <p className="text-xs text-muted-foreground">
-              ارفع لقطة شاشة لتأكيد تحويل انستاباي
+              {t("checkout.step2.screenshotHint")}
             </p>
 
             {previewUrl ? (
               <div className="relative rounded-xl overflow-hidden border border-border bg-muted">
                 <img
                   src={previewUrl}
-                  alt="معاينة لقطة الشاشة"
+                  alt={t("checkout.step2.screenshotPreview")}
                   className="w-full max-h-64 object-contain"
                 />
                 <button
                   type="button"
                   onClick={removeScreenshot}
                   className="absolute top-2 left-2 size-8 rounded-full bg-foreground/80 text-background flex items-center justify-center hover:bg-foreground transition-colors"
-                  aria-label="إزالة لقطة الشاشة"
+                  aria-label={t("checkout.step2.removeScreenshot")}
                 >
                   <X className="size-4" />
                 </button>
@@ -154,8 +156,8 @@ export function StepTwo({ onSubmit, isSubmitting }: StepTwoProps) {
                   <Upload className="size-6" />
                 </div>
                 <div className="flex flex-col items-center gap-1">
-                  <span className="text-sm font-medium text-foreground">اضغط لرفع لقطة الشاشة</span>
-                  <span className="text-xs text-muted-foreground">JPEG أو PNG</span>
+                  <span className="text-sm font-medium text-foreground">{t("checkout.step2.uploadPrompt")}</span>
+                  <span className="text-xs text-muted-foreground">{t("checkout.step2.uploadFormat")}</span>
                 </div>
               </button>
             )}
@@ -166,7 +168,7 @@ export function StepTwo({ onSubmit, isSubmitting }: StepTwoProps) {
               accept="image/jpeg,image/png,image/jpg"
               className="sr-only"
               onChange={handleFileChange}
-              aria-label="رفع لقطة شاشة التحويل"
+              aria-label={t("checkout.step2.screenshotLabel")}
             />
           </div>
         </CardContent>
@@ -179,18 +181,18 @@ export function StepTwo({ onSubmit, isSubmitting }: StepTwoProps) {
           disabled={!isFormValid || isSubmitting}
           className="w-full h-14 text-base font-bold rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/25 disabled:opacity-50 disabled:shadow-none"
         >
-          {isSubmitting ? (
+            {isSubmitting ? (
             <span className="flex items-center gap-2">
               <Loader2 className="size-5 animate-spin" />
-              جاري الإرسال...
+              {t("checkout.step2.submitting")}
             </span>
           ) : (
-            "تأكيد التحويل"
+            t("checkout.step2.submit")
           )}
         </Button>
         {!isFormValid && !isSubmitting && (
           <p className="text-xs text-muted-foreground text-center mt-2">
-            أكمل جميع الحقول المطلوبة للمتابعة
+            {t("checkout.step2.completeFields")}
           </p>
         )}
       </div>

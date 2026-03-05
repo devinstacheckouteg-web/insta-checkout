@@ -1,18 +1,32 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Menu, X, CreditCard } from "lucide-react"
+import { Menu, X, CreditCard, LogOut } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
-
-const navLinks = [
-  { label: "الميزات", href: "#features" },
-  { label: "ازاي بتشتغل", href: "#how-it-works" },
-  { label: "الأسعار", href: "#pricing" },
-]
+import { onAuthStateChanged } from "firebase/auth"
+import { useTranslations } from "@/lib/locale-provider"
+import { LanguageSwitcher } from "./language-switcher"
+import { auth, signOutUser } from "@/lib/firebase"
 
 export function Navbar() {
+  const { t } = useTranslations()
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [user, setUser] = useState<typeof auth.currentUser>(null)
+
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, (u) => {
+      if (u?.email) console.log("[Navbar] Logged in as:", u.email)
+      setUser(u)
+    })
+    return () => unsub()
+  }, [])
+
+  const navLinks = [
+    { label: t("landing.nav.features"), href: "#features" },
+    { label: t("landing.nav.howItWorks"), href: "#how-it-works" },
+    { label: t("landing.nav.pricing"), href: "#pricing" },
+  ]
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10)
@@ -54,19 +68,38 @@ export function Navbar() {
 
         {/* Desktop CTA */}
         <div className="hidden items-center gap-3 md:flex">
-          <a
-            href="/onboard"
-            className="rounded-lg border border-primary px-5 py-2.5 text-sm font-semibold text-primary transition-colors hover:bg-primary hover:text-primary-foreground"
-          >
-            ابدأ دلوقتي — مجاناً
-          </a>
+          <LanguageSwitcher />
+          {user ? (
+            <>
+              <a
+                href="/dashboard"
+                className="rounded-lg border border-primary px-5 py-2.5 text-sm font-semibold text-primary transition-colors hover:bg-primary hover:text-primary-foreground"
+              >
+                {t("landing.nav.dashboard")}
+              </a>
+              <button
+                onClick={() => signOutUser().then(() => (window.location.href = "/"))}
+                className="flex items-center gap-2 rounded-lg border border-border px-4 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+              >
+                <LogOut className="h-4 w-4" />
+                {t("landing.nav.logout")}
+              </button>
+            </>
+          ) : (
+            <a
+              href="/login"
+              className="rounded-lg border border-primary px-5 py-2.5 text-sm font-semibold text-primary transition-colors hover:bg-primary hover:text-primary-foreground"
+            >
+              {t("landing.nav.login")}
+            </a>
+          )}
         </div>
 
         {/* Mobile Hamburger */}
         <button
           className="flex h-10 w-10 items-center justify-center rounded-lg text-foreground md:hidden"
           onClick={() => setMobileOpen(!mobileOpen)}
-          aria-label={mobileOpen ? "إغلاق القائمة" : "فتح القائمة"}
+          aria-label={mobileOpen ? t("common.closeMenu") : t("common.openMenu")}
         >
           {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
         </button>
@@ -82,6 +115,9 @@ export function Navbar() {
             className="overflow-hidden border-t border-border bg-card md:hidden"
           >
             <div className="flex flex-col gap-1 px-4 py-4">
+              <div className="mb-2 flex justify-center md:hidden">
+                <LanguageSwitcher />
+              </div>
               {navLinks.map((link) => (
                 <a
                   key={link.href}
@@ -92,13 +128,35 @@ export function Navbar() {
                   {link.label}
                 </a>
               ))}
-              <a
-                href="/onboard"
-                onClick={() => setMobileOpen(false)}
-                className="mt-2 rounded-lg bg-primary px-4 py-3 text-center text-base font-semibold text-primary-foreground"
-              >
-                ابدأ دلوقتي — مجاناً
-              </a>
+              {user ? (
+                <>
+                  <a
+                    href="/dashboard"
+                    onClick={() => setMobileOpen(false)}
+                    className="mt-2 rounded-lg bg-primary px-4 py-3 text-center text-base font-semibold text-primary-foreground"
+                  >
+                    {t("landing.nav.dashboard")}
+                  </a>
+                  <button
+                    onClick={() => {
+                      setMobileOpen(false)
+                      signOutUser().then(() => (window.location.href = "/"))
+                    }}
+                    className="mt-2 flex items-center justify-center gap-2 rounded-lg border border-border px-4 py-3 text-base font-medium text-muted-foreground hover:bg-secondary"
+                  >
+                    <LogOut className="h-4 w-4" />
+                    {t("landing.nav.logout")}
+                  </button>
+                </>
+              ) : (
+                <a
+                  href="/login"
+                  onClick={() => setMobileOpen(false)}
+                  className="mt-2 rounded-lg bg-primary px-4 py-3 text-center text-base font-semibold text-primary-foreground"
+                >
+                  {t("landing.nav.login")}
+                </a>
+              )}
             </div>
           </motion.div>
         )}

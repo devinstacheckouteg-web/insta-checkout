@@ -3,7 +3,7 @@
 import { Cake, Shirt, Smartphone, Scissors, Package, Hash, ShieldCheck, ArrowLeftRight } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { BUSINESS_TYPE_OPTIONS } from "./types";
+import { useTranslations } from "@/lib/locale-provider";
 
 const ICON_MAP = {
   Cake,
@@ -13,7 +13,15 @@ const ICON_MAP = {
   Package,
 } as const;
 
-type BusinessTypeValue = (typeof BUSINESS_TYPE_OPTIONS)[number]["value"];
+const BUSINESS_TYPE_ICON: Record<string, keyof typeof ICON_MAP> = {
+  "Food & Desserts": "Cake",
+  Clothing: "Shirt",
+  Electronics: "Smartphone",
+  Services: "Scissors",
+  Other: "Package",
+};
+
+type BusinessTypeValue = "Food & Desserts" | "Clothing" | "Electronics" | "Services" | "Other";
 
 interface CheckoutPreviewProps {
   businessName: string;
@@ -42,9 +50,8 @@ export function CheckoutPreview({
   size = "full",
   className,
 }: CheckoutPreviewProps) {
-  const iconName = businessType
-    ? (BUSINESS_TYPE_OPTIONS.find((o) => o.value === businessType)?.icon ?? "Cake")
-    : "Cake";
+  const { t } = useTranslations()
+  const iconName = BUSINESS_TYPE_ICON[businessType] ?? "Cake";
   const IconComponent = ICON_MAP[iconName] ?? Cake;
 
   // Match Checkout app layout: SellerHeader first, then Order Card, Payment Instructions, InstaPay, Verification, CTA
@@ -70,11 +77,11 @@ export function CheckoutPreview({
         <CardContent className="flex items-center justify-between py-4">
           <div className="flex flex-col gap-0.5">
             <h3 className="font-bold text-foreground text-base leading-tight">{productName}</h3>
-            <p className="text-xs text-muted-foreground">طلب دفع</p>
+            <p className="text-xs text-muted-foreground">{t("checkout.step1.paymentRequest")}</p>
           </div>
           <div className="flex items-center gap-1.5 bg-[#0D9488]/10 text-[#0D9488] px-3 py-2 rounded-xl">
             <span className="text-xl font-bold">{price}</span>
-            <span className="text-xs font-semibold">ج.م</span>
+            <span className="text-xs font-semibold">{t("common.egpShort")}</span>
           </div>
         </CardContent>
       </Card>
@@ -84,24 +91,24 @@ export function CheckoutPreview({
         <div className="bg-accent px-4 py-2.5 border-b border-border">
           <p className="text-xs font-bold text-accent-foreground flex items-center gap-2">
             <Smartphone className="size-3.5" />
-            طريقة الدفع عبر انستاباي
+            {t("checkout.step1.paymentMethod")}
           </p>
         </div>
         <CardContent className="py-3">
           <ol className="flex flex-col gap-2 text-xs text-foreground">
             <li className="flex items-start gap-2">
               <span className="flex size-5 items-center justify-center rounded-full bg-[#0D9488]/10 text-[#0D9488] text-[10px] font-bold shrink-0">1</span>
-              <span>افتح تطبيق البنك أو المحفظة التي تدعم انستاباي</span>
+              <span>{t("checkout.step1.instructions.0")}</span>
             </li>
             <li className="flex items-start gap-2">
               <span className="flex size-5 items-center justify-center rounded-full bg-[#0D9488]/10 text-[#0D9488] text-[10px] font-bold shrink-0">2</span>
-              <span>ابدأ تحويل جديد</span>
+              <span>{t("checkout.step1.instructions.1")}</span>
             </li>
             <li className="flex items-start gap-2">
               <span className="flex size-5 items-center justify-center rounded-full bg-[#0D9488]/10 text-[#0D9488] shrink-0">
                 <ArrowLeftRight className="size-2.5" />
               </span>
-              <span>أدخل رقم الحساب أدناه</span>
+              <span>{t("checkout.step1.instructions.2")}</span>
             </li>
           </ol>
         </CardContent>
@@ -112,7 +119,7 @@ export function CheckoutPreview({
         <CardContent className="py-3">
           <label className="text-xs font-medium text-muted-foreground flex items-center gap-1.5 mb-2">
             <Hash className="size-3.5" />
-            رقم حساب انستاباي
+            {t("checkout.step1.instapayAccount")}
           </label>
           <div className="rounded-xl bg-[#F8FAFC] border border-dashed border-[#CBD5E1] p-3">
             <span className="text-sm font-mono font-medium tracking-[1px] text-foreground" dir="ltr">
@@ -126,10 +133,10 @@ export function CheckoutPreview({
       <div className="bg-[#ECFDF5] border-s-[3px] border-[#10B981] rounded-lg p-3">
         <div className="flex items-start gap-2 mb-2">
           <ShieldCheck className="size-4 text-[#0D9488] shrink-0 mt-0.5" />
-          <p className="text-xs font-bold text-[#0D9488]">كيف تتأكد أنك ترسل للشخص الصحيح؟</p>
+          <p className="text-xs font-bold text-[#0D9488]">{t("checkout.step1.verifyTitle")}</p>
         </div>
         <p className="text-[11px] text-foreground leading-relaxed mb-2">
-          بعد إدخال رقم الحساب، سيعرض لك انستاباي اسمًا مُقنّعًا للمستلم قبل تأكيد التحويل. يجب أن ترى:
+          {t("checkout.step1.verifyIntro")}
         </p>
         <div className="bg-card rounded-xl p-3 border border-[#10B981]/20 text-center shadow-[0_1px_3px_rgba(0,0,0,0.08)]">
           <span className="text-sm font-bold font-mono tracking-wider text-[#0D9488]" dir="ltr">
@@ -137,7 +144,7 @@ export function CheckoutPreview({
           </span>
         </div>
         <p className="text-[11px] text-muted-foreground leading-relaxed mt-2">
-          إذا تطابق الاسم، فأنت ترسل إلى الحساب الصحيح. تابع وأكّد التحويل!
+          {t("checkout.step1.verifyMatch")}
         </p>
       </div>
 
@@ -152,7 +159,7 @@ export function CheckoutPreview({
             : "bg-[#0D9488] text-white hover:bg-[#0F766E] shadow-lg"
         )}
       >
-        لقد قمت بالدفع
+        {t("checkout.step1.paidButton")}
       </button>
     </div>
   );

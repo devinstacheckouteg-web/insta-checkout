@@ -1,7 +1,9 @@
 "use client"
 
 import { useState, useCallback } from "react"
+import { useTranslations } from "@/lib/locale-provider"
 import { SellerHeader } from "./seller-header"
+import { LanguageSwitcher } from "../language-switcher"
 import { StepIndicator } from "./step-indicator"
 import { StepOne } from "./step-one"
 import { StepTwo } from "./step-two"
@@ -30,6 +32,7 @@ export function CheckoutFlow({
   maskedName,
   whatsappLink,
 }: CheckoutFlowProps) {
+  const { t } = useTranslations()
   const [currentStep, setCurrentStep] = useState(1)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -55,6 +58,9 @@ export function CheckoutFlow({
   return (
     <div className="min-h-dvh bg-background">
       <div className="mx-auto max-w-md px-4 py-6">
+        <div className="flex justify-end mb-4">
+          <LanguageSwitcher />
+        </div>
         <SellerHeader
           businessName={sellerName}
           categoryTag={categoryTag}
@@ -95,7 +101,7 @@ export function CheckoutFlow({
         {/* Footer */}
         <footer className="mt-10 pb-4 text-center">
           <p className="text-xs text-muted-foreground">
-            مدعوم بواسطة دفع آمن عبر انستاباي
+            {t("checkout.footer")}
           </p>
         </footer>
       </div>

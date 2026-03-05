@@ -4,6 +4,7 @@ import { useState, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
+import { useTranslations } from "@/lib/locale-provider";
 import { StepIndicator } from "./step-indicator";
 import { StepTwo } from "./step-two";
 import { StepThree } from "./step-three";
@@ -11,6 +12,7 @@ import { ConfirmationScreen } from "./confirmation-screen";
 import type { Step2Data } from "./types";
 
 export function OnboardingForm() {
+  const { t } = useTranslations();
   const searchParams = useSearchParams();
   const categoryFromUrl = searchParams.get("category");
 
@@ -53,7 +55,7 @@ export function OnboardingForm() {
           body = text ? JSON.parse(text) : {};
         } catch {
           console.error("[POST /sellers] Invalid JSON response", res.status, text);
-          toast.error("مشكلة من الخادم — جرّب تاني بعد شوية");
+          toast.error(t("onboard.errors.serverError"));
           return;
         }
 
@@ -64,9 +66,9 @@ export function OnboardingForm() {
 
         if (res.status === 409) {
           if (body.error === "DUPLICATE_EMAIL") {
-            toast.error("الإيميل ده مسجل قبل كده. جرّب تسجيل الدخول بدل التسجيل.");
+            toast.error(t("onboard.errors.duplicateEmail"));
           } else {
-            toast.error("الرقم ده مسجل قبل كده. جرّب رقم تاني أو تواصل معانا.");
+            toast.error(t("onboard.errors.duplicateNumber"));
           }
           setCurrentStep(2);
           return;
@@ -91,18 +93,18 @@ export function OnboardingForm() {
 
         if (res.status === 500) {
           console.error("[POST /sellers] Server error", body);
-          toast.error("مشكلة من الخادم — جرّب تاني بعد شوية");
+          toast.error(t("onboard.errors.serverError"));
           return;
         }
 
         console.error("[POST /sellers] Unexpected response", res.status, body);
-        toast.error(body?.message || "حصل مشكلة. جرّب تاني.");
+        toast.error(body?.message || t("onboard.errors.generic"));
       } catch (err) {
         console.error("[POST /sellers] Request failed", err);
         toast.error(
           err instanceof TypeError && err.message?.includes("fetch")
-            ? "تأكد من اتصالك بالإنترنت وإن الباكند شغال"
-            : "حصل مشكلة. جرّب تاني."
+            ? t("onboard.errors.networkError")
+            : t("onboard.errors.generic")
         );
       } finally {
         setIsSubmitting(false);

@@ -11,15 +11,13 @@ const sellerSchema = new mongoose.Schema(
     },
     category: {
       type: String,
-      required: [true, "Category is required"],
-      enum: {
-        values: [
-          "Food & Desserts",
-          "Clothing",
-          "Services",
-          "Electronics",
-          "Other",
-        ],
+      required: false,
+      default: null,
+      validate: {
+        validator(v) {
+          if (v == null || v === "") return true;
+          return ["Food & Desserts", "Clothing", "Services", "Electronics", "Other"].includes(v);
+        },
         message: "Category must be one of the allowed values",
       },
     },

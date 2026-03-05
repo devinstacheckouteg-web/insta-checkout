@@ -4,6 +4,7 @@ import {
   getAuth,
   GoogleAuthProvider,
   signInWithPopup,
+  signOut,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   sendPasswordResetEmail,
@@ -47,4 +48,8 @@ export async function signInWithEmail(email: string, password: string): Promise<
 
 export async function resetPassword(email: string): Promise<void> {
   await sendPasswordResetEmail(auth, email)
+}
+
+export async function signOutUser(): Promise<void> {
+  await signOut(auth)
 }

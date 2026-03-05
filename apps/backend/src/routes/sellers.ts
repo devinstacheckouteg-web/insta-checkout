@@ -3,14 +3,6 @@ import { connectToMongo } from "../db.js"
 
 const router = Router()
 
-const VALID_CATEGORIES = [
-  "Food & Desserts",
-  "Clothing",
-  "Services",
-  "Electronics",
-  "Other",
-]
-
 interface ValidationError {
   field: string
   message: string
@@ -24,11 +16,6 @@ function validateBody(body: Record<string, unknown>): ValidationError[] {
     errors.push({ field: "businessName", message: "Business name is required" })
   } else if (businessName.length < 2 || businessName.length > 100) {
     errors.push({ field: "businessName", message: "Business name must be 2–100 characters" })
-  }
-
-  const category = typeof body.category === "string" ? body.category.trim() : ""
-  if (category && !VALID_CATEGORIES.includes(category)) {
-    errors.push({ field: "category", message: `Category must be one of: ${VALID_CATEGORIES.join(", ")}` })
   }
 
   const instapayNumber = typeof body.instapayNumber === "string" ? body.instapayNumber.trim() : ""
@@ -116,7 +103,7 @@ router.post("/", async (req: Request, res: Response) => {
     }
 
     const result = await sellers.insertOne(doc)
-    console.log(`[POST /sellers] Success in ${Date.now() - start}ms, id=${result.insertedId}`)
+    console.log(`[POST /sellers] Success in ${Date.now() - start}ms, id=${result.insertedId}, email=${email}, firebaseUid=${firebaseUid}`)
 
     res.status(201).json({
       success: true,

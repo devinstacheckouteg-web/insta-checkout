@@ -1,17 +1,15 @@
 "use client"
 
+import { useTranslations } from "@/lib/locale-provider"
+
 interface StepIndicatorProps {
   currentStep: number
   totalSteps: number
 }
 
-const stepLabels = [
-  "تفاصيل الطلب",
-  "تأكيد الدفع",
-  "اكتمل",
-]
-
 export function StepIndicator({ currentStep, totalSteps }: StepIndicatorProps) {
+  const { get } = useTranslations()
+  const stepLabels = (get("checkout.steps") ?? ["Order details", "Confirm payment", "Complete"]) as string[]
   return (
     <div className="flex items-center gap-2 py-4" role="progressbar" aria-valuenow={currentStep} aria-valuemin={1} aria-valuemax={totalSteps}>
       {Array.from({ length: totalSteps }, (_, i) => {

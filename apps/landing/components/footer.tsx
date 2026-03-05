@@ -1,20 +1,7 @@
+"use client"
+
 import { CreditCard, Instagram } from "lucide-react"
-
-const productLinks = [
-  { label: "الميزات", href: "#features" },
-  { label: "الأسعار", href: "#pricing" },
-  { label: "ازاي بتشتغل", href: "#how-it-works" },
-]
-
-const companyLinks = [
-  { label: "عننا", href: "#" },
-  { label: "تواصل معانا", href: "#" },
-]
-
-const legalLinks = [
-  { label: "سياسة الخصوصية", href: "#" },
-  { label: "الشروط والأحكام", href: "#" },
-]
+import { useTranslations } from "@/lib/locale-provider"
 
 function WhatsAppIcon({ className }: { className?: string }) {
   return (
@@ -56,6 +43,21 @@ function FacebookIcon({ className }: { className?: string }) {
 }
 
 export function Footer() {
+  const { t } = useTranslations()
+  const productLinks = [
+    { label: t("landing.nav.features"), href: "#features" },
+    { label: t("landing.nav.pricing"), href: "#pricing" },
+    { label: t("landing.nav.howItWorks"), href: "#how-it-works" },
+  ]
+  const companyLinks = [
+    { label: t("landing.footer.about"), href: "#" },
+    { label: t("landing.footer.contact"), href: "#" },
+  ]
+  const legalLinks = [
+    { label: t("landing.footer.privacy"), href: "#" },
+    { label: t("landing.footer.terms"), href: "#" },
+  ]
+
   return (
     <footer className="bg-footer-bg px-4 py-12 lg:px-8 lg:py-16">
       <div className="mx-auto max-w-7xl">
@@ -71,13 +73,13 @@ export function Footer() {
               </span>
             </div>
             <p className="mt-3 text-sm leading-relaxed text-footer-muted">
-              أسهل طريقة تقبض InstaPay
+              {t("landing.footer.tagline")}
             </p>
           </div>
 
           {/* Product */}
           <div>
-            <h4 className="text-sm font-bold text-footer-foreground">المنتج</h4>
+            <h4 className="text-sm font-bold text-footer-foreground">{t("landing.footer.product")}</h4>
             <ul className="mt-3 flex flex-col gap-2">
               {productLinks.map((link) => (
                 <li key={link.label}>
@@ -94,7 +96,7 @@ export function Footer() {
 
           {/* Company */}
           <div>
-            <h4 className="text-sm font-bold text-footer-foreground">الشركة</h4>
+            <h4 className="text-sm font-bold text-footer-foreground">{t("landing.footer.company")}</h4>
             <ul className="mt-3 flex flex-col gap-2">
               {companyLinks.map((link) => (
                 <li key={link.label}>
@@ -111,7 +113,7 @@ export function Footer() {
 
           {/* Legal */}
           <div>
-            <h4 className="text-sm font-bold text-footer-foreground">قانوني</h4>
+            <h4 className="text-sm font-bold text-footer-foreground">{t("landing.footer.legal")}</h4>
             <ul className="mt-3 flex flex-col gap-2">
               {legalLinks.map((link) => (
                 <li key={link.label}>
@@ -144,7 +146,7 @@ export function Footer() {
             </a>
           </div>
           <p className="text-xs text-footer-muted">
-            {'© ٢٠٢٦ InstaPay Checkout. كل الحقوق محفوظة.'}
+            {t("landing.footer.copyright")}
           </p>
         </div>
       </div>

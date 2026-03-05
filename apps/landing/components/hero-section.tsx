@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion"
 import { MessageCircle, Smartphone } from "lucide-react"
+import { useTranslations } from "@/lib/locale-provider"
 
 function PhoneMockup({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return (
@@ -14,7 +15,7 @@ function PhoneMockup({ children, className = "" }: { children: React.ReactNode; 
   )
 }
 
-function WhatsAppChat() {
+function WhatsAppChat({ t }: { t: (k: string) => string }) {
   return (
     <div className="flex flex-col gap-2 p-3">
       <div className="flex items-center gap-2 border-b border-border pb-2">
@@ -22,30 +23,30 @@ function WhatsAppChat() {
           <MessageCircle className="h-4 w-4 text-primary-foreground" />
         </div>
         <div>
-          <p className="text-xs font-bold text-foreground">InstaPay Bot</p>
-          <p className="text-[10px] text-muted-foreground">متصل</p>
+          <p className="text-xs font-bold text-foreground">{t("landing.heroMockup.botName")}</p>
+          <p className="text-[10px] text-muted-foreground">{t("landing.heroMockup.connected")}</p>
         </div>
       </div>
       {/* Seller message */}
       <div className="self-end rounded-xl rounded-tl-sm bg-primary/10 px-3 py-2">
-        <p className="text-xs text-foreground">شوكولاتة كيك ٣٠٠</p>
+        <p className="text-xs text-foreground">{t("landing.heroMockup.sellerMessage")}</p>
       </div>
       {/* Bot reply */}
       <div className="self-start rounded-xl rounded-tr-sm bg-card px-3 py-2 shadow-sm">
-        <p className="text-xs text-foreground">تم إنشاء لينك الدفع:</p>
+        <p className="text-xs text-foreground">{t("landing.heroMockup.botReply")}</p>
         <p className="mt-1 text-[10px] font-mono text-primary break-all">
           pay.instapay.co/choc-cake
         </p>
       </div>
       {/* Seller sends */}
       <div className="self-end rounded-xl rounded-tl-sm bg-primary/10 px-3 py-2">
-        <p className="text-xs text-muted-foreground">ابعته للعميل</p>
+        <p className="text-xs text-muted-foreground">{t("landing.heroMockup.sellerSends")}</p>
       </div>
     </div>
   )
 }
 
-function CheckoutPreview() {
+function CheckoutPreview({ t }: { t: (k: string) => string }) {
   return (
     <div className="flex flex-col items-center gap-3 p-4">
       <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary">
@@ -54,19 +55,20 @@ function CheckoutPreview() {
       <p className="text-xs font-bold text-foreground">Sweet Treats</p>
       <div className="w-full rounded-lg bg-card p-3 shadow-sm">
         <div className="flex items-center justify-between">
-          <span className="text-xs text-muted-foreground">شوكولاتة كيك</span>
-          <span className="font-mono text-sm font-bold text-foreground">٣٠٠ ج.م</span>
+          <span className="text-xs text-muted-foreground">{t("landing.heroMockup.productLabel")}</span>
+          <span className="font-mono text-sm font-bold text-foreground">300 {t("common.egpShort")}</span>
         </div>
       </div>
       <button className="w-full rounded-lg bg-primary py-2.5 text-xs font-bold text-primary-foreground">
-        ادفع بـ InstaPay
+        {t("landing.heroMockup.payButton")}
       </button>
-      <p className="text-[10px] text-muted-foreground">مأمّن ومشفّر بالكامل</p>
+      <p className="text-[10px] text-muted-foreground">{t("landing.heroMockup.secure")}</p>
     </div>
   )
 }
 
 export function HeroSection() {
+  const { t } = useTranslations()
   return (
     <section className="relative overflow-hidden bg-background px-4 pt-12 pb-16 lg:px-8 lg:pt-20 lg:pb-24">
       <div className="mx-auto flex max-w-7xl flex-col-reverse items-center gap-12 lg:flex-row lg:gap-16">
@@ -82,7 +84,7 @@ export function HeroSection() {
             transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
           >
             <PhoneMockup>
-              <WhatsAppChat />
+              <WhatsAppChat t={t} />
             </PhoneMockup>
           </motion.div>
           <motion.div
@@ -91,7 +93,7 @@ export function HeroSection() {
             className="-mb-4"
           >
             <PhoneMockup className="w-[220px] scale-90">
-              <CheckoutPreview />
+              <CheckoutPreview t={t} />
             </PhoneMockup>
           </motion.div>
           {/* Teal glow */}
@@ -106,20 +108,19 @@ export function HeroSection() {
           className="flex flex-col items-center text-center lg:w-1/2 lg:items-start lg:text-start"
         >
           <h1 className="text-4xl font-bold leading-tight text-foreground text-balance lg:text-[3.5rem] lg:leading-[1.15]">
-            أنشئ رابط دفع إنستا باي — في ثواني
+            {t("landing.hero.headline")}
           </h1>
           <p className="mt-5 max-w-lg text-base leading-relaxed text-muted-foreground lg:text-lg">
-            أنشئ لينك دفع InstaPay في ثانيتين وابعته لعميلك على واتساب.
-            بدون موقع، بدون تطبيق، بدون تعقيد.
+            {t("landing.hero.subheadline")}
           </p>
           <a
             href="/onboard"
             className="mt-8 inline-flex w-full items-center justify-center rounded-lg bg-primary px-8 py-4 text-base font-bold text-primary-foreground transition-colors hover:bg-primary-hover sm:w-auto"
           >
-            ابدأ مجاناً
+            {t("landing.hero.cta")}
           </a>
           <p className="mt-4 text-sm text-muted-foreground">
-            مجاني بالكامل · بدون بطاقة ائتمان · جاهز في دقيقتين
+            {t("landing.hero.trust")}
           </p>
         </motion.div>
       </div>

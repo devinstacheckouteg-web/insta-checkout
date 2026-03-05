@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { Copy, Check, ShieldCheck, Smartphone, ArrowLeftRight, Hash, CircleAlert } from "lucide-react"
+import { useTranslations } from "@/lib/locale-provider"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
@@ -23,16 +24,18 @@ export function StepOne({
   maskedName,
   onProceed,
 }: StepOneProps) {
+  const { t, get } = useTranslations()
   const [copied, setCopied] = useState(false)
+  const instructions = (get("checkout.step1.instructions") ?? []) as string[]
 
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(instaPayAccount)
       setCopied(true)
-      toast.success("تم نسخ رقم الحساب")
+      toast.success(t("checkout.step1.accountCopied"))
       setTimeout(() => setCopied(false), 2500)
     } catch {
-      toast.error("فشل النسخ. يرجى النسخ يدويًا.")
+      toast.error(t("checkout.step1.copyFailed"))
     }
   }
 
@@ -52,11 +55,11 @@ export function StepOne({
         <CardContent className="flex items-center justify-between py-5">
           <div className="flex flex-col gap-1">
             <h3 className="font-bold text-foreground text-lg leading-tight">{productName}</h3>
-            <p className="text-sm text-muted-foreground">طلب دفع</p>
+            <p className="text-sm text-muted-foreground">{t("checkout.step1.paymentRequest")}</p>
           </div>
           <div className="flex items-center gap-1.5 bg-[#0D9488]/10 text-[#0D9488] px-4 py-2.5 rounded-xl">
             <span className="text-2xl font-bold">{price}</span>
-            <span className="text-sm font-semibold">ج.م</span>
+            <span className="text-sm font-semibold">{t("common.egpShort")}</span>
           </div>
         </CardContent>
       </Card>
@@ -66,24 +69,24 @@ export function StepOne({
         <div className="bg-accent px-5 py-3 border-b border-border">
           <p className="text-sm font-bold text-accent-foreground flex items-center gap-2">
             <Smartphone className="size-4" />
-            طريقة الدفع عبر انستاباي
+            {t("checkout.step1.paymentMethod")}
           </p>
         </div>
         <CardContent className="py-5">
           <ol className="flex flex-col gap-3 text-sm text-foreground">
             <li className="flex items-start gap-3">
               <span className="flex items-center justify-center size-6 rounded-full bg-[#0D9488]/10 text-[#0D9488] text-xs font-bold shrink-0 mt-0.5">1</span>
-              <span>افتح تطبيق البنك أو المحفظة التي تدعم انستاباي</span>
+              <span>{instructions[0] ?? ""}</span>
             </li>
             <li className="flex items-start gap-3">
               <span className="flex items-center justify-center size-6 rounded-full bg-[#0D9488]/10 text-[#0D9488] text-xs font-bold shrink-0 mt-0.5">2</span>
-              <span>ابدأ تحويل جديد</span>
+              <span>{instructions[1] ?? ""}</span>
             </li>
             <li className="flex items-start gap-3">
               <span className="flex items-center justify-center size-6 rounded-full bg-[#0D9488]/10 text-[#0D9488] text-xs font-bold shrink-0 mt-0.5">
                 <ArrowLeftRight className="size-3" />
               </span>
-              <span>أدخل رقم الحساب أدناه</span>
+              <span>{instructions[2] ?? ""}</span>
             </li>
           </ol>
         </CardContent>
@@ -95,7 +98,7 @@ export function StepOne({
           <div className="flex flex-col gap-3">
             <label className="text-sm font-medium text-muted-foreground flex items-center gap-2">
               <Hash className="size-4" />
-              رقم حساب انستاباي
+              {t("checkout.step1.instapayAccount")}
             </label>
             <div className="flex items-center gap-3 bg-[#F8FAFC] border border-dashed border-[#CBD5E1] rounded-xl p-4">
               <span
@@ -117,12 +120,12 @@ export function StepOne({
                 {copied ? (
                   <>
                     <Check className="size-4" />
-                    <span>تم</span>
+                    <span>{t("common.done")}</span>
                   </>
                 ) : (
                   <>
                     <Copy className="size-4" />
-                    <span>نسخ</span>
+                    <span>{t("common.copy")}</span>
                   </>
                 )}
               </Button>
@@ -136,10 +139,10 @@ export function StepOne({
         <div className="flex flex-col gap-3">
           <div className="flex items-center gap-2 text-[#0D9488]">
             <ShieldCheck className="size-5" />
-            <p className="text-sm font-bold">كيف تتأكد أنك ترسل للشخص الصحيح؟</p>
+            <p className="text-sm font-bold">{t("checkout.step1.verifyTitle")}</p>
           </div>
           <p className="text-sm text-foreground leading-relaxed">
-            بعد إدخال رقم الحساب، سيعرض لك انستاباي اسمًا مُقنّعًا للمستلم قبل تأكيد التحويل. يجب أن ترى:
+            {t("checkout.step1.verifyIntro")}
           </p>
           <div className="bg-card rounded-xl p-4 border border-[#10B981]/20 text-center shadow-[0_1px_3px_rgba(0,0,0,0.08)]">
             <span className="text-lg font-bold font-mono tracking-wider text-[#0D9488]" dir="ltr">
@@ -147,7 +150,7 @@ export function StepOne({
             </span>
           </div>
           <p className="text-sm text-muted-foreground leading-relaxed">
-            إذا تطابق الاسم، فأنت ترسل إلى الحساب الصحيح. تابع وأكّد التحويل!
+            {t("checkout.step1.verifyMatch")}
           </p>
         </div>
       </div>
@@ -158,7 +161,7 @@ export function StepOne({
           <div className="flex items-center gap-2 bg-[#FEF3C7] rounded-lg px-3 py-2 mb-2.5">
             <CircleAlert className="size-4 text-[#D97706] shrink-0" />
             <p className="text-xs text-[#92400E] leading-snug">
-              تأكد من ظهور رسالة <span className="font-bold">"تم التحويل بنجاح"</span> في تطبيقك قبل المتابعة
+              {t("checkout.step1.ensureTransfer")}
             </p>
           </div>
           <button
@@ -166,7 +169,7 @@ export function StepOne({
             onClick={onProceed}
             className="w-full h-12 text-base font-bold rounded-xl bg-[#0D9488] text-card hover:bg-[#0F766E] shadow-lg inline-flex items-center justify-center transition-colors cursor-pointer"
           >
-            لقد قمت بالدفع
+            {t("checkout.step1.paidButton")}
           </button>
         </div>
       </div>

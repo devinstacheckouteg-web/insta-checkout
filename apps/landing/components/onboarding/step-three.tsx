@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { motion } from "framer-motion";
+import { useTranslations } from "@/lib/locale-provider";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -25,12 +26,14 @@ import {
   resetPassword,
 } from "@/lib/firebase";
 
-const emailAuthSchema = z.object({
-  email: z.string().email("البريد الإلكتروني غير صالح"),
-  password: z.string().min(8, "كلمة السر لازم تكون ٨ أحرف على الأقل"),
-});
+function createEmailAuthSchema(t: (key: string) => string) {
+  return z.object({
+    email: z.string().email(t("onboard.validation.emailInvalid")),
+    password: z.string().min(8, t("onboard.validation.passwordMin")),
+  });
+}
 
-type AuthData = z.infer<typeof emailAuthSchema>;
+type AuthData = z.infer<ReturnType<typeof createEmailAuthSchema>>;
 
 interface StepThreeProps {
   onBack: () => void;
@@ -38,6 +41,8 @@ interface StepThreeProps {
 }
 
 export function StepThree({ onBack, onSubmit }: StepThreeProps) {
+  const { t } = useTranslations()
+  const emailAuthSchema = useMemo(() => createEmailAuthSchema(t), [t])
   const [authMode, setAuthMode] = useState<"choice" | "signup" | "signin">("choice");
   const [isLoading, setIsLoading] = useState(false);
   const [forgetPasswordOpen, setForgetPasswordOpen] = useState(false);
@@ -62,22 +67,22 @@ export function StepThree({ onBack, onSubmit }: StepThreeProps) {
     try {
       const user = await signInWithGoogle();
       if (!user.email?.trim()) {
-        toast.error("حساب جوجل ده ما فيهوش إيميل — جرّب إنشاء حساب بالإيميل بدلاً.");
+        toast.error(t("onboard.errors.googleNoEmail"));
         return;
       }
-      toast.success("تم إنشاء حسابك! جاري حفظ بيانات متجرك...");
+      toast.success(t("onboard.errors.accountCreated"));
       await onSubmit(user.uid, user.email);
     } catch (err: unknown) {
       const code = (err as { code?: string })?.code;
       console.error("[Firebase Google sign-in]", code, err);
       const message =
         code === "auth/popup-closed-by-user"
-          ? "تم إلغاء تسجيل الدخول"
+          ? t("onboard.errors.signInCancelled")
           : code === "auth/operation-not-allowed"
-            ? "تسجيل الدخول بجوجل مش مفعّل — فعّله من Firebase Console"
+            ? t("onboard.errors.googleNotEnabled")
             : code === "auth/unauthorized-domain"
-              ? "الدومين ده مش مسموح — أضفه في Firebase → Authorized domains"
-              : "حصل مشكلة. جرّب تاني.";
+              ? t("onboard.errors.unauthorizedDomain")
+              : t("onboard.errors.generic");
       toast.error(message);
     } finally {
       setIsLoading(false);
@@ -89,17 +94,17 @@ export function StepThree({ onBack, onSubmit }: StepThreeProps) {
     setIsLoading(true);
     try {
       const user = await signUpWithEmail(data.email, data.password);
-      toast.success("تم إنشاء حسابك! جاري حفظ بيانات متجرك...");
+      toast.success(t("onboard.errors.accountCreated"));
       await onSubmit(user.uid, user.email || data.email);
     } catch (err: unknown) {
       const code = (err as { code?: string })?.code;
       console.error("[Firebase email sign-up]", code, err);
       if (code === "auth/email-already-in-use") {
-        toast.error("الإيميل ده مسجل. جرّب تسجيل الدخول بدل التسجيل.");
+        toast.error(t("onboard.errors.emailInUse"));
       } else if (code === "auth/operation-not-allowed") {
-        toast.error("التسجيل بالإيميل مش مفعّل — فعّله من Firebase Console");
+        toast.error(t("onboard.errors.emailNotEnabled"));
       } else {
-        toast.error("حصل مشكلة. جرّب تاني.");
+        toast.error(t("onboard.errors.generic"));
       }
     } finally {
       setIsLoading(false);
@@ -110,17 +115,17 @@ export function StepThree({ onBack, onSubmit }: StepThreeProps) {
     setIsLoading(true);
     try {
       const user = await signInWithEmail(data.email, data.password);
-      toast.success("تم تسجيل الدخول!");
+      toast.success(t("onboard.errors.signInSuccess"));
       await onSubmit(user.uid, user.email || data.email);
     } catch (err: unknown) {
       const code = (err as { code?: string })?.code;
       console.error("[Firebase email sign-in]", code, err);
       if (code === "auth/invalid-credential" || code === "auth/wrong-password") {
-        toast.error("الإيميل أو كلمة السر غلط. جرّب تاني.");
+        toast.error(t("onboard.errors.invalidCredentials"));
       } else if (code === "auth/user-not-found") {
-        toast.error("مفيش حساب بالإيميل ده. سجّل حساب جديد أولاً.");
+        toast.error(t("onboard.errors.userNotFound"));
       } else {
-        toast.error("حصل مشكلة. جرّب تاني.");
+        toast.error(t("onboard.errors.generic"));
       }
     } finally {
       setIsLoading(false);
@@ -130,20 +135,20 @@ export function StepThree({ onBack, onSubmit }: StepThreeProps) {
   const handleForgetPassword = async () => {
     const e = forgetEmail.trim() || email?.trim();
     if (!e) {
-      toast.error("ادخل الإيميل أولاً");
+      toast.error(t("onboard.errors.enterEmailFirst"));
       return;
     }
     setForgetSending(true);
     try {
       await resetPassword(e);
       setForgetSent(true);
-      toast.success("أرسلنا لك إيميل لإعادة تعيين كلمة السر");
+      toast.success(t("onboard.errors.resetEmailSent"));
     } catch (err: unknown) {
       const code = (err as { code?: string })?.code;
       if (code === "auth/user-not-found") {
-        toast.error("مفيش حساب بالإيميل ده.");
+        toast.error(t("onboard.errors.userNotFoundReset"));
       } else {
-        toast.error("حصل مشكلة. جرّب تاني.");
+        toast.error(t("onboard.errors.generic"));
       }
     } finally {
       setForgetSending(false);
@@ -160,9 +165,9 @@ export function StepThree({ onBack, onSubmit }: StepThreeProps) {
         className="space-y-6"
       >
         <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
-          <h3 className="text-lg font-bold text-foreground mb-1">إنشاء حسابك</h3>
+          <h3 className="text-lg font-bold text-foreground mb-1">{t("onboard.step3.title")}</h3>
           <p className="text-sm text-muted-foreground">
-            سجّل حسابك عشان تقدر تدخل وتدير متجرك لاحقاً
+            {t("onboard.step3.subtitle")}
           </p>
         </div>
 
@@ -185,7 +190,7 @@ export function StepThree({ onBack, onSubmit }: StepThreeProps) {
                     <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
                     <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
                   </svg>
-                  سجّل بحساب جوجل
+                  {t("onboard.step3.googleSignIn")}
                 </>
               )}
             </Button>
@@ -195,7 +200,7 @@ export function StepThree({ onBack, onSubmit }: StepThreeProps) {
                 <span className="w-full border-t border-border" />
               </div>
               <div className="relative flex justify-center text-xs">
-                <span className="bg-background px-3 text-muted-foreground">أو</span>
+                <span className="bg-background px-3 text-muted-foreground">{t("onboard.step3.or")}</span>
               </div>
             </div>
 
@@ -207,7 +212,7 @@ export function StepThree({ onBack, onSubmit }: StepThreeProps) {
                 className="h-12 rounded-xl text-base gap-2"
               >
                 <Mail className="h-4 w-4" />
-                إنشاء حساب
+                {t("onboard.step3.createAccount")}
               </Button>
               <Button
                 type="button"
@@ -216,7 +221,7 @@ export function StepThree({ onBack, onSubmit }: StepThreeProps) {
                 className="h-12 rounded-xl text-base gap-2"
               >
                 <KeyRound className="h-4 w-4" />
-                تسجيل دخول
+                {t("onboard.step3.signIn")}
               </Button>
             </div>
           </div>
@@ -230,7 +235,7 @@ export function StepThree({ onBack, onSubmit }: StepThreeProps) {
             className="rounded-xl border border-border bg-card p-6 space-y-4"
           >
             <div className="space-y-2">
-              <Label htmlFor="email">البريد الإلكتروني</Label>
+              <Label htmlFor="email">{t("onboard.step3.email")}</Label>
               <Input
                 id="email"
                 type="email"
@@ -246,7 +251,7 @@ export function StepThree({ onBack, onSubmit }: StepThreeProps) {
 
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="password">كلمة السر</Label>
+                <Label htmlFor="password">{t("onboard.step3.password")}</Label>
                 <button
                   type="button"
                   onClick={() => {
@@ -256,13 +261,13 @@ export function StepThree({ onBack, onSubmit }: StepThreeProps) {
                   }}
                   className="text-xs text-primary hover:underline"
                 >
-                  نسيت كلمة السر؟
+                  {t("onboard.step3.forgotPassword")}
                 </button>
               </div>
               <Input
                 id="password"
                 type="password"
-                placeholder={authMode === "signup" ? "8 أحرف على الأقل" : "كلمة السر"}
+                placeholder={authMode === "signup" ? t("onboard.step3.placeholders.passwordSignup") : t("onboard.step3.placeholders.passwordSignin")}
                 className="h-12 rounded-lg"
                 dir="ltr"
                 {...register("password")}
@@ -281,7 +286,7 @@ export function StepThree({ onBack, onSubmit }: StepThreeProps) {
                 className="h-12 flex-1 rounded-xl gap-2"
               >
                 <ArrowLeftToLine className="h-4 w-4" />
-                رجوع
+                {t("onboard.step3.back")}
               </Button>
               <Button
                 type="submit"
@@ -291,9 +296,9 @@ export function StepThree({ onBack, onSubmit }: StepThreeProps) {
                 {isLoading ? (
                   <Loader2 className="h-5 w-5 animate-spin" />
                 ) : authMode === "signup" ? (
-                  "إنشاء الحساب"
+                  t("onboard.step3.createAccountBtn")
                 ) : (
-                  "تسجيل الدخول"
+                  t("onboard.step3.signInBtn")
                 )}
               </Button>
             </div>
@@ -308,7 +313,7 @@ export function StepThree({ onBack, onSubmit }: StepThreeProps) {
             className="w-full gap-2 text-muted-foreground"
           >
             <ArrowLeftToLine className="h-4 w-4" />
-            رجوع للخطوة السابقة
+            {t("onboard.step3.backToPrevious")}
           </Button>
         )}
       </motion.div>
@@ -319,17 +324,17 @@ export function StepThree({ onBack, onSubmit }: StepThreeProps) {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Lock className="h-5 w-5" />
-              نسيت كلمة السر؟
+              {t("onboard.step3.forgotTitle")}
             </DialogTitle>
             <DialogDescription>
               {forgetSent
-                ? "تم الإرسال! افتح إيميلك واضغط على اللينك عشان تعيّن كلمة سر جديدة."
-                : "ادخل إيميلك وهنبعته لك لينك لإعادة تعيين كلمة السر."}
+                ? t("onboard.step3.forgotSent")
+                : t("onboard.step3.forgotPrompt")}
             </DialogDescription>
           </DialogHeader>
           {!forgetSent && (
             <div className="space-y-2 py-2">
-              <Label htmlFor="forget-email">البريد الإلكتروني</Label>
+              <Label htmlFor="forget-email">{t("onboard.step3.email")}</Label>
               <Input
                 id="forget-email"
                 type="email"
@@ -343,14 +348,14 @@ export function StepThree({ onBack, onSubmit }: StepThreeProps) {
           )}
           <DialogFooter>
             {forgetSent ? (
-              <Button onClick={() => setForgetPasswordOpen(false)}>تمام</Button>
+              <Button onClick={() => setForgetPasswordOpen(false)}>{t("onboard.step3.ok")}</Button>
             ) : (
               <>
                 <Button variant="outline" onClick={() => setForgetPasswordOpen(false)}>
-                  إلغاء
+                  {t("common.cancel")}
                 </Button>
                 <Button onClick={handleForgetPassword} disabled={forgetSending}>
-                  {forgetSending ? <Loader2 className="h-4 w-4 animate-spin" /> : "إرسال"}
+                  {forgetSending ? <Loader2 className="h-4 w-4 animate-spin" /> : t("common.send")}
                 </Button>
               </>
             )}

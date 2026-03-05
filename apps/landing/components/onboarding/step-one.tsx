@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
@@ -7,7 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, Sparkles } from "lucide-react";
-import { step1Schema, type Step1Data, BUSINESS_TYPE_OPTIONS, STEP1_DEFAULTS } from "./types";
+import { useTranslations } from "@/lib/locale-provider";
+import { createStep1Schema, getBusinessTypeOptions, type Step1Data } from "./types";
 import { CheckoutPreview } from "./checkout-preview";
 
 interface StepOneProps {
@@ -15,8 +17,20 @@ interface StepOneProps {
   onNext: (data: Step1Data) => void;
 }
 
+const FALLBACK_DEFAULTS: Step1Data = {
+  businessType: "Food & Desserts",
+  productName: "Chocolate cake",
+  price: 300,
+  businessName: "Sarah's Sweets",
+  instapayNumber: "01XXXXXXXXX",
+  maskedFullName: "S*** M*** A** M***",
+};
+
 export function StepOne({ defaultValues, onNext }: StepOneProps) {
-  const mergedDefaults = { ...STEP1_DEFAULTS, ...defaultValues };
+  const { t, get } = useTranslations()
+  const step1Schema = useMemo(() => createStep1Schema(t), [t])
+  const BUSINESS_TYPE_OPTIONS = useMemo(() => getBusinessTypeOptions(t, get), [t, get])
+  const mergedDefaults = { ...FALLBACK_DEFAULTS, ...defaultValues };
 
   const {
     register,
@@ -28,12 +42,12 @@ export function StepOne({ defaultValues, onNext }: StepOneProps) {
     defaultValues: mergedDefaults,
   });
 
-  const businessType = watch("businessType") ?? STEP1_DEFAULTS.businessType;
-  const productName = watch("productName") ?? STEP1_DEFAULTS.productName;
-  const price = watch("price") ?? STEP1_DEFAULTS.price;
-  const businessName = watch("businessName") ?? STEP1_DEFAULTS.businessName;
-  const instapayNumber = watch("instapayNumber") ?? STEP1_DEFAULTS.instapayNumber;
-  const maskedFullName = watch("maskedFullName") ?? STEP1_DEFAULTS.maskedFullName;
+  const businessType = watch("businessType") ?? FALLBACK_DEFAULTS.businessType;
+  const productName = watch("productName") ?? FALLBACK_DEFAULTS.productName;
+  const price = watch("price") ?? FALLBACK_DEFAULTS.price;
+  const businessName = watch("businessName") ?? FALLBACK_DEFAULTS.businessName;
+  const instapayNumber = watch("instapayNumber") ?? FALLBACK_DEFAULTS.instapayNumber;
+  const maskedFullName = watch("maskedFullName") ?? FALLBACK_DEFAULTS.maskedFullName;
 
   const handleBusinessTypeSelect = (value: Step1Data["businessType"]) => {
     if (!value) return;
@@ -49,12 +63,12 @@ export function StepOne({ defaultValues, onNext }: StepOneProps) {
 
   const onSubmit = (data: Partial<Step1Data>) => {
     const payload: Step1Data = {
-      businessType: data.businessType ?? STEP1_DEFAULTS.businessType,
-      productName: data.productName ?? STEP1_DEFAULTS.productName,
-      price: data.price ?? STEP1_DEFAULTS.price,
-      businessName: data.businessName ?? STEP1_DEFAULTS.businessName,
-      instapayNumber: data.instapayNumber ?? STEP1_DEFAULTS.instapayNumber,
-      maskedFullName: data.maskedFullName ?? STEP1_DEFAULTS.maskedFullName,
+      businessType: data.businessType ?? FALLBACK_DEFAULTS.businessType,
+      productName: data.productName ?? FALLBACK_DEFAULTS.productName,
+      price: data.price ?? FALLBACK_DEFAULTS.price,
+      businessName: data.businessName ?? FALLBACK_DEFAULTS.businessName,
+      instapayNumber: data.instapayNumber ?? FALLBACK_DEFAULTS.instapayNumber,
+      maskedFullName: data.maskedFullName ?? FALLBACK_DEFAULTS.maskedFullName,
     };
     onNext(payload);
   };
@@ -83,10 +97,10 @@ export function StepOne({ defaultValues, onNext }: StepOneProps) {
       >
         <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
           <Sparkles className="h-5 w-5 text-primary" />
-          شوف إزاي صفحة الدفع بتاعتك هتبان
+          {t("onboard.step1.title")}
         </h3>
         <p className="text-sm text-muted-foreground">
-          كل اللي بتشوفه هنا عرض توضيحي للصفحة اللي هتبعتلها لعميلك وقت الدفع — اختار نوع بيزنسك وغيّر التفاصيل لو حابب
+          {t("onboard.step1.description")}
         </p>
       </motion.div>
 
@@ -97,7 +111,7 @@ export function StepOne({ defaultValues, onNext }: StepOneProps) {
         transition={{ delay: 0.05 }}
         className="space-y-2.5"
       >
-        <Label className="text-muted-foreground">نوع البيزنس</Label>
+        <Label className="text-muted-foreground">{t("onboard.step1.businessType")}</Label>
         <div className="flex flex-wrap gap-2">
           {BUSINESS_TYPE_OPTIONS.map((opt) => (
             <motion.button
@@ -129,7 +143,7 @@ export function StepOne({ defaultValues, onNext }: StepOneProps) {
           className="block sm:hidden w-full space-y-2"
         >
           <p className="text-xs font-medium text-muted-foreground text-center">
-            ده شكل لينك الدفع اللي عميلك هيشوفه لما تبعتله
+            {t("onboard.step1.demoLabel")}
           </p>
           {demoPreview}
         </motion.div>
@@ -145,35 +159,34 @@ export function StepOne({ defaultValues, onNext }: StepOneProps) {
           <details className="group rounded-xl border border-border/60 bg-muted/30 overflow-hidden mt-6">
             <summary className="flex items-center justify-between gap-2 px-4 py-3 cursor-pointer list-none text-sm font-medium text-muted-foreground hover:text-foreground transition-colors [&::-webkit-details-marker]:hidden">
               <span className="flex items-center gap-2">
-                <span className="text-primary">عرض توضيحي</span>
-                — تقدر تغيّر التفاصيل لو حابب
+                {t("onboard.step1.expandLabel")}
               </span>
               <ChevronDown className="h-4 w-4 transition-transform group-open:rotate-180" />
             </summary>
             <div className="px-4 pb-4 pt-1 space-y-3 border-t border-border/40">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-3">
                 <div className="space-y-1.5">
-                  <Label htmlFor="demoBusinessName" className="text-xs text-muted-foreground">اسم البيزنس</Label>
-                  <Input id="demoBusinessName" className="h-10 text-sm bg-background" placeholder="مثلاً: Sweet Bites" {...register("businessName")} />
+                  <Label htmlFor="demoBusinessName" className="text-xs text-muted-foreground">{t("onboard.step1.businessName")}</Label>
+                  <Input id="demoBusinessName" className="h-10 text-sm bg-background" placeholder={t("onboard.step1.placeholders.businessName")} {...register("businessName")} />
                 </div>
                 <div className="space-y-1.5">
-                  <Label htmlFor="demoProductName" className="text-xs text-muted-foreground">المنتج</Label>
-                  <Input id="demoProductName" className="h-10 text-sm bg-background" placeholder="شوكولاتة كيك" {...register("productName")} />
+                  <Label htmlFor="demoProductName" className="text-xs text-muted-foreground">{t("onboard.step1.product")}</Label>
+                  <Input id="demoProductName" className="h-10 text-sm bg-background" placeholder={t("onboard.step1.placeholders.product")} {...register("productName")} />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <Label htmlFor="demoPrice" className="text-xs text-muted-foreground">السعر (ج.م)</Label>
+                  <Label htmlFor="demoPrice" className="text-xs text-muted-foreground">{t("onboard.step1.price")}</Label>
                   <Input id="demoPrice" type="number" min={1} className="h-10 text-sm font-mono bg-background" dir="ltr" {...register("price", { valueAsNumber: true })} />
                 </div>
                 <div className="space-y-1.5">
-                  <Label htmlFor="demoInstapay" className="text-xs text-muted-foreground">رقم InstaPay</Label>
+                  <Label htmlFor="demoInstapay" className="text-xs text-muted-foreground">{t("onboard.step1.instapayNumber")}</Label>
                   <Input id="demoInstapay" className="h-10 text-sm font-mono bg-background" dir="ltr" placeholder="01XXXXXXXXX" {...register("instapayNumber")} />
                 </div>
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="demoMaskedName" className="text-xs text-muted-foreground">الاسم المقنّع</Label>
-                <Input id="demoMaskedName" className="h-10 text-sm bg-background" placeholder="أ*** م*** أ** م***" {...register("maskedFullName")} />
+                <Label htmlFor="demoMaskedName" className="text-xs text-muted-foreground">{t("onboard.step1.maskedName")}</Label>
+                <Input id="demoMaskedName" className="h-10 text-sm bg-background" placeholder={t("onboard.step1.placeholders.maskedName")} {...register("maskedFullName")} />
               </div>
             </div>
           </details>
@@ -181,7 +194,7 @@ export function StepOne({ defaultValues, onNext }: StepOneProps) {
             type="submit"
             className="h-12 w-full rounded-xl bg-primary text-base font-bold text-primary-foreground hover:bg-primary-hover transition-all shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/25 active:scale-[0.99]"
           >
-            عجبني — أكمل التسجيل!
+            {t("onboard.step1.cta")}
           </Button>
         </motion.div>
         {/* Desktop: preview on the side — this is what the customer will see */}
@@ -192,7 +205,7 @@ export function StepOne({ defaultValues, onNext }: StepOneProps) {
           className="hidden sm:block shrink-0 w-[280px] sticky top-4 space-y-2"
         >
           <p className="text-xs font-medium text-muted-foreground text-center">
-            ده شكل لينك الدفع اللي عميلك هيشوفه لما تبعتله
+            {t("onboard.step1.demoLabel")}
           </p>
           {demoPreview}
         </motion.div>

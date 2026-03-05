@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import { Cairo, Inter, JetBrains_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { FirebaseAnalytics } from '@/components/firebase-analytics'
+import { LocaleProvider } from '@/lib/locale-provider'
 import './globals.css'
 
 const cairo = Cairo({
@@ -23,9 +24,9 @@ const jetbrainsMono = JetBrains_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'InstaPay Checkout — حوّل كل محادثة لعملية بيع',
+  title: 'InstaPay Checkout — Turn every chat into a sale | حوّل كل محادثة لعملية بيع',
   description:
-    'أنشئ لينك دفع InstaPay في ثانيتين وابعته لعميلك على واتساب. بدون موقع، بدون تطبيق، بدون تعقيد.',
+    'Create an InstaPay payment link in seconds and send it to your customer on WhatsApp. أنشئ لينك دفع InstaPay في ثانيتين وابعته لعميلك على واتساب.',
   generator: 'v0.app',
   icons: {
     icon: [
@@ -46,11 +47,13 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="ar" dir="rtl">
+    <html lang="ar" dir="rtl" suppressHydrationWarning>
       <body className={`${cairo.variable} ${inter.variable} ${jetbrainsMono.variable} font-sans antialiased`}>
-        {children}
-        <Analytics />
-        <FirebaseAnalytics />
+        <LocaleProvider>
+          {children}
+          <Analytics />
+          <FirebaseAnalytics />
+        </LocaleProvider>
       </body>
     </html>
   )

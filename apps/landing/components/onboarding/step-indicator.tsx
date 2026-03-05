@@ -3,14 +3,15 @@
 import { motion } from "framer-motion";
 import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-const steps = ["معلوماتك", "سجّل حسابك"];
+import { useTranslations } from "@/lib/locale-provider";
 
 interface StepIndicatorProps {
   currentStep: number;
 }
 
 export function StepIndicator({ currentStep }: StepIndicatorProps) {
+  const { get } = useTranslations()
+  const steps = (get("onboard.steps") ?? ["Try the product", "Your info", "Create account"]) as string[]
   return (
     <div className="flex items-center justify-center gap-0 w-full mb-8">
       {steps.map((label, index) => {

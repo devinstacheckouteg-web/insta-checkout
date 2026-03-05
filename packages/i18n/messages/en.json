@@ -1,0 +1,408 @@
+{
+  "common": {
+    "brand": "InstaPay Checkout",
+    "egp": "EGP",
+    "egpShort": "EGP",
+    "loading": "Loading",
+    "back": "Back",
+    "cancel": "Cancel",
+    "send": "Send",
+    "done": "Done",
+    "copy": "Copy",
+    "closeMenu": "Close menu",
+    "openMenu": "Open menu"
+  },
+  "landing": {
+    "meta": {
+      "title": "InstaPay Checkout — Turn every chat into a sale",
+      "description": "Create an InstaPay payment link in seconds and send it to your customer on WhatsApp. No website, no app, no hassle."
+    },
+    "nav": {
+      "features": "Features",
+      "howItWorks": "How it works",
+      "pricing": "Pricing",
+      "cta": "Get started — free",
+      "login": "Login",
+      "dashboard": "Dashboard",
+      "logout": "Log out"
+    },
+    "loginPage": {
+      "title": "Sign in to your dashboard",
+      "subtitle": "Use the same account you used when you registered",
+      "googleSignIn": "Sign in with Google",
+      "or": "or",
+      "signInWithEmail": "Sign in with email",
+      "noAccount": "Don't have an account?",
+      "registerLink": "Register your business",
+      "passwordRequired": "Password is required"
+    },
+    "hero": {
+      "headline": "Create an InstaPay payment link — in seconds",
+      "subheadline": "Create an InstaPay payment link in two seconds and send it to your customer on WhatsApp. No website, no app, no hassle.",
+      "cta": "Start free",
+      "trust": "100% free · No credit card · Ready in 2 minutes"
+    },
+    "heroMockup": {
+      "botName": "InstaPay Bot",
+      "connected": "Connected",
+      "sellerMessage": "Chocolate cake 300",
+      "botReply": "Payment link created:",
+      "sellerSends": "Sending to customer",
+      "productLabel": "Chocolate cake",
+      "payButton": "Pay with InstaPay",
+      "secure": "Secure and fully encrypted"
+    },
+    "painPoints": {
+      "title": "Still selling the old way?",
+      "items": [
+        {
+          "title": "Telling customers 'transfer to this number and send me a screenshot'",
+          "description": "Old-school and no guarantee the transfer actually arrived."
+        },
+        {
+          "title": "Tracking every order manually in notes",
+          "description": "Everything in your head or phone notes — easy to forget."
+        },
+        {
+          "title": "Not sure who paid and who didn't",
+          "description": "Asking every customer: did you transfer? No quick way to verify."
+        },
+        {
+          "title": "Customers drop off because payment is complicated",
+          "description": "The more steps, the more people bounce."
+        }
+      ],
+      "cta": "There's an easier way"
+    },
+    "howItWorks": {
+      "title": "How it works",
+      "subtitle": "3 steps — and you're getting paid",
+      "stepNumbers": ["1", "2", "3"],
+      "steps": [
+        {
+          "title": "Sign up in 2 minutes",
+          "description": "Enter your business name and InstaPay account — that's it."
+        },
+        {
+          "title": "Create an instant payment link",
+          "description": "Send the product name and price to the bot on WhatsApp — you get a link in a second."
+        },
+        {
+          "title": "Customer pays, you track",
+          "description": "Customer opens the link, transfers via InstaPay, and confirms. You get an instant notification."
+        }
+      ]
+    },
+    "features": {
+      "title": "Everything you need in one place",
+      "items": [
+        {
+          "title": "Instant payment links",
+          "description": "Create a link for any product or service in a second from WhatsApp."
+        },
+        {
+          "title": "Payment page with your brand",
+          "description": "Your business name, your colors — customers feel like they're buying directly from you."
+        },
+        {
+          "title": "Instant notifications",
+          "description": "The moment a customer pays, you get a WhatsApp notification with details and screenshot."
+        },
+        {
+          "title": "Order tracking",
+          "description": "All orders in one place — who paid, who hasn't, and the total."
+        },
+        {
+          "title": "Auto catalog",
+          "description": "Every product you create a link for is saved automatically — over time you build a full catalog."
+        },
+        {
+          "title": "Payment verification",
+          "description": "Customer sees the masked recipient name on InstaPay before transferring — trust from the first moment."
+        }
+      ]
+    },
+    "socialProof": {
+      "title": "Sellers like you are getting paid faster",
+      "testimonials": [
+        {
+          "initials": "S M",
+          "name": "Sarah M.",
+          "type": "Sells desserts on Instagram",
+          "quote": "I used to spend half an hour tracking every order. Now it's all automatic."
+        },
+        {
+          "initials": "A R",
+          "name": "Ahmed R.",
+          "type": "Mobile store",
+          "quote": "My customers pay faster because the link is simple and direct."
+        },
+        {
+          "initials": "N A",
+          "name": "Nour A.",
+          "type": "Vintage clothing",
+          "quote": "Best part is there's no app — everything's on WhatsApp."
+        }
+      ],
+      "stats": [
+        { "value": "500+", "label": "sellers" },
+        { "value": "10,000+", "label": "payment links" },
+        { "value": "2 min", "label": "to get started" }
+      ]
+    },
+    "pricing": {
+      "title": "Start free — scale when you're ready",
+      "free": "Free",
+      "pro": "Pro",
+      "popular": "Most popular",
+      "perMonth": "EGP / month",
+      "freeFeatures": [
+        "Unlimited payment links",
+        "Payment page with your brand",
+        "WhatsApp notifications",
+        "Order tracking"
+      ],
+      "proFeatures": [
+        "All free features",
+        "Full product catalog",
+        "Custom store page",
+        "Reports and analytics",
+        "No \"Powered by\" badge"
+      ],
+      "ctaFree": "Start free",
+      "ctaPro": "Try 14 days free"
+    },
+    "finalCta": {
+      "title": "Ready to get paid the easy way?",
+      "subtitle": "Sign up in 2 minutes and send your first payment link to a customer today.",
+      "cta": "Get started — free",
+      "noCard": "No credit card required"
+    },
+    "footer": {
+      "tagline": "The easiest way to accept InstaPay",
+      "product": "Product",
+      "company": "Company",
+      "legal": "Legal",
+      "about": "About us",
+      "contact": "Contact us",
+      "privacy": "Privacy Policy",
+      "terms": "Terms & Conditions",
+      "copyright": "© 2026 InstaPay Checkout. All rights reserved."
+    }
+  },
+  "onboard": {
+    "meta": {
+      "title": "Register your business — InstaPay Checkout",
+      "description": "Sign up in 2 minutes and start accepting InstaPay payments from your customers via WhatsApp."
+    },
+    "page": {
+      "title": "Register your business on InstaPay Checkout",
+      "subtitle": "2 simple steps and you're accepting payments online"
+    },
+    "steps": ["Your info", "Create account"],
+    "step1": {
+      "title": "See how your payment page will look",
+      "description": "Everything you see here is a preview of the page you'll send to your customer at checkout — pick your business type and tweak the details if you like",
+      "businessType": "Business type",
+      "demoLabel": "This is what your customer will see when you send them the payment link",
+      "expandLabel": "Preview — you can change the details if you like",
+      "businessName": "Business name",
+      "product": "Product",
+      "price": "Price (EGP)",
+      "instapayNumber": "InstaPay number",
+      "maskedName": "Masked name",
+      "placeholders": {
+        "businessName": "e.g. Sweet Bites",
+        "product": "Chocolate cake",
+        "maskedName": "A*** M*** A** M***"
+      },
+      "cta": "Looks good — let's sign up!"
+    },
+    "step2": {
+      "businessName": "Business name *",
+      "instapayNumber": "InstaPay account number *",
+      "maskedFullName": "Masked name *",
+      "whatsappNumber": "WhatsApp number *",
+      "placeholders": {
+        "businessName": "e.g. Sweet Bites",
+        "instapayNumber": "The number customers will transfer to",
+        "maskedName": "e.g. A*** M*** A** M***"
+      },
+      "maskedNameWhy": "Why do we ask for the masked name?",
+      "maskedNameExplanation": "When a customer transfers via InstaPay, the app shows them a masked recipient name before they confirm. We display the same name on the payment page so the customer can verify they're sending to the right person.",
+      "back": "Back",
+      "cta": "Final step — create account",
+      "preview": {
+        "defaultBusiness": "Your business name",
+        "defaultProduct": "Product name",
+        "defaultMasked": "A*** M*** A** M***"
+      }
+    },
+    "step3": {
+      "title": "Create your account",
+      "subtitle": "Sign up so you can access and manage your store later",
+      "googleSignIn": "Sign up with Google",
+      "or": "or",
+      "createAccount": "Create account",
+      "signIn": "Sign in",
+      "email": "Email",
+      "password": "Password",
+      "forgotPassword": "Forgot password?",
+      "placeholders": {
+        "email": "you@example.com",
+        "passwordSignup": "At least 8 characters",
+        "passwordSignin": "Password"
+      },
+      "back": "Back",
+      "backToPrevious": "Back to previous step",
+      "createAccountBtn": "Create account",
+      "signInBtn": "Sign in",
+      "forgotTitle": "Forgot password?",
+      "forgotSent": "Sent! Check your email and click the link to set a new password.",
+      "forgotPrompt": "Enter your email and we'll send you a link to reset your password.",
+      "ok": "OK"
+    },
+    "validation": {
+      "businessType": "Choose a business type",
+      "businessNameMin": "Business name must be at least 2 characters",
+      "businessNameMax": "Business name must be under 100 characters",
+      "instapayRequired": "InstaPay account number is required",
+      "maskedNameRequired": "Masked name is required",
+      "maskedNameAsterisk": "Masked name must contain at least one *",
+      "whatsappValid": "Valid Egyptian WhatsApp number — e.g. 01XXXXXXXXX or 10XXXXXXXX",
+      "emailInvalid": "Invalid email address",
+      "passwordMin": "Password must be at least 8 characters"
+    },
+    "confirmation": {
+      "defaultProduct": "Sample product",
+      "title": "You're all set! 🎉",
+      "subtitle": "Your account is ready. We'll send you a WhatsApp message — open WhatsApp and create your first payment link!",
+      "firstLink": "Create your first payment link",
+      "dashboard": "Go to dashboard",
+      "help": "Need help?",
+      "contactWhatsApp": "Chat with us on WhatsApp"
+    },
+    "errors": {
+      "serverError": "Server issue — try again in a bit",
+      "duplicateEmail": "This email is already registered. Try signing in instead.",
+      "duplicateNumber": "This number is already registered. Try a different number or contact us.",
+      "networkError": "Make sure you're connected to the internet and the backend is running",
+      "generic": "Something went wrong. Try again.",
+      "googleNoEmail": "This Google account has no email — try creating an account with email instead.",
+      "accountCreated": "Account created! Saving your store details...",
+      "signInSuccess": "Signed in!",
+      "signInCancelled": "Sign-in cancelled",
+      "googleNotEnabled": "Google sign-in is not enabled — enable it in Firebase Console",
+      "unauthorizedDomain": "This domain is not allowed — add it in Firebase → Authorized domains",
+      "emailInUse": "This email is already registered. Try signing in instead.",
+      "emailNotEnabled": "Email sign-up is not enabled — enable it in Firebase Console",
+      "invalidCredentials": "Wrong email or password. Try again.",
+      "userNotFound": "No account with this email. Create a new account first.",
+      "enterEmailFirst": "Enter your email first",
+      "resetEmailSent": "We've sent you an email to reset your password",
+      "userNotFoundReset": "No account with this email."
+    }
+  },
+  "checkout": {
+    "meta": {
+      "title": "Checkout - InstaPay Payment",
+      "description": "Complete your InstaPay payment securely. Verify, pay, and confirm your transaction."
+    },
+    "steps": ["Order details", "Confirm payment", "Complete"],
+    "step1": {
+      "paymentRequest": "Payment request",
+      "paymentMethod": "How to pay with InstaPay",
+      "instructions": [
+        "Open your bank app or wallet that supports InstaPay",
+        "Start a new transfer",
+        "Enter the account number below"
+      ],
+      "instapayAccount": "InstaPay account number",
+      "accountCopied": "Account number copied",
+      "copyFailed": "Copy failed. Please copy manually.",
+      "verifyTitle": "How do you know you're sending to the right person?",
+      "verifyIntro": "After entering the account number, InstaPay will show you a masked recipient name before you confirm the transfer. You should see:",
+      "verifyMatch": "If the name matches, you're sending to the right account. Go ahead and confirm the transfer!",
+      "ensureTransfer": "Make sure you see \"Transfer successful\" in your app before continuing",
+      "ensureTransferBold": "Transfer successful",
+      "paidButton": "I've paid"
+    },
+    "step2": {
+      "phoneLabel": "Phone number used for the transfer",
+      "phoneHint": "So the seller can match their InstaPay notification",
+      "phoneRequired": "Phone number is required",
+      "phoneLength": "Phone number must be 11 digits",
+      "phonePrefix": "Phone number must start with 01",
+      "screenshotLabel": "Transfer screenshot",
+      "screenshotHint": "Upload a screenshot to confirm your InstaPay transfer",
+      "screenshotPreview": "Screenshot preview",
+      "removeScreenshot": "Remove screenshot",
+      "uploadPrompt": "Click to upload screenshot",
+      "uploadFormat": "JPEG or PNG",
+      "submit": "Confirm transfer",
+      "submitting": "Submitting...",
+      "completeFields": "Complete all required fields to continue"
+    },
+    "step3": {
+      "successTitle": "Payment details sent!",
+      "successSubtitle": "Your payment details have been sent to {sellerName}. The seller will review and confirm your order soon.",
+      "orderSummary": "Order summary",
+      "product": "Product",
+      "amount": "Amount",
+      "seller": "Seller",
+      "statusTitle": "Awaiting seller confirmation",
+      "statusSubtitle": "You'll get a confirmation once the seller verifies your payment. Usually takes a few minutes.",
+      "contactSeller": "Contact seller on WhatsApp"
+    },
+    "footer": "Powered by secure InstaPay payment"
+  },
+  "dashboard": {
+    "meta": {
+      "title": "Dashboard — InstaPay Checkout",
+      "description": "Your dashboard — coming soon"
+    },
+    "title": "Welcome to your dashboard",
+    "subtitle": "Your store dashboard — soon you'll be able to see orders, add products, and send payment links to customers.",
+    "whatsappHint": "For now, create your first payment link via WhatsApp 👇",
+    "openWhatsApp": "Open WhatsApp and get started"
+  },
+  "businessTypes": {
+    "food": "Food & desserts",
+    "clothing": "Clothing",
+    "electronics": "Electronics",
+    "services": "Services",
+    "other": "Other",
+    "defaults": {
+      "food": {
+        "product": "Chocolate cake",
+        "business": "Sarah's Sweets",
+        "masked": "S*** M*** A** M***",
+        "category": "Desserts & baked goods"
+      },
+      "clothing": {
+        "product": "Denim jeans",
+        "business": "Nadia's Boutique",
+        "masked": "N*** A*** D** Y***",
+        "category": "Clothing & accessories"
+      },
+      "electronics": {
+        "product": "Phone case",
+        "business": "Tech Store",
+        "masked": "A*** H*** M** D***",
+        "category": "Electronics"
+      },
+      "services": {
+        "product": "Photo shoot session",
+        "business": "Nour Studio",
+        "masked": "N*** W*** R**",
+        "category": "Services"
+      },
+      "other": {
+        "product": "Sample product",
+        "business": "Sample store",
+        "masked": "A*** M*** A** M***",
+        "category": "Other"
+      }
+    }
+  }
+}

@@ -4,6 +4,7 @@ import { Geist_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { Toaster } from 'sonner'
 import { FirebaseAnalytics } from '@/components/firebase-analytics'
+import { LocaleProvider } from '@/lib/locale-provider'
 import './globals.css'
 
 const _cairo = Cairo({ subsets: ['arabic', 'latin'], variable: '--font-cairo' })
@@ -28,12 +29,14 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="ar" dir="rtl">
+    <html lang="ar" dir="rtl" suppressHydrationWarning>
       <body className={`${_cairo.variable} ${_geistMono.variable} font-sans antialiased`}>
-        {children}
-        <Toaster position="top-center" richColors />
-        <Analytics />
-        <FirebaseAnalytics />
+        <LocaleProvider>
+          {children}
+          <Toaster position="top-center" richColors />
+          <Analytics />
+          <FirebaseAnalytics />
+        </LocaleProvider>
       </body>
     </html>
   )

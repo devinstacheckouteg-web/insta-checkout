@@ -1,5 +1,7 @@
 import { CheckoutFlow } from "@/components/checkout/checkout-flow"
 
+export const dynamic = "force-dynamic";
+
 // In production, this data would come from a database lookup
 // based on the unique payment link ID in the URL path
 const checkoutData = {
