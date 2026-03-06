@@ -30,7 +30,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      pull-requests: [read, write]
+      pull-requests: write
     steps:
       - name: Wait for Railway deployment and get backend URL
         id: railway
